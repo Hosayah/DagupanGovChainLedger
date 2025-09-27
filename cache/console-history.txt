@@ -1,0 +1,2 @@
+await Contract.hasRole(await Contract.GOV_AGENCY_ROLE(), "0x717Be33FB8008724Be07Ee7eF4C21e97fd8506b2");
+const Contract = await ethers.getContractAt("GovSpendingLedger", "0xb6b41394ca36174f2C913Ee9E78Ca2B04C7FEE18");
