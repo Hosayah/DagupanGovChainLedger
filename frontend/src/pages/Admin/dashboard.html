@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gov Agency Dashboard</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <!-- Sidebar -->
+  <div class="flex h-screen">
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6">
+      <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Total Accounts</h2>
+          <p class="mt-2 text-2xl font-bold text-blue-700">20</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Total Government Agency</h2>
+          <p class="mt-2 text-2xl font-bold text-blue-700">10</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Total Auditor</h2>
+          <p class="mt-2 text-2xl font-bold text-blue-700">10</p>
+        </div>
+      </div>
+
+      <!-- Recent Records -->
+      <div class="mt-10">
+        <h2 class="text-2xl font-bold mb-4">Recent Approval</h2>
+        <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+          <table class="min-w-full text-left">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="px-4 py-2">User ID</th>
+                <th class="px-4 py-2">Agency/Organization</th>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Account Type</th>
+                <th class="px-4 py-2">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t">
+                <td class="px-4 py-2">1</td>
+                <td class="px-4 py-2">DPWH</td>
+                <td class="px-4 py-2">officer@dpwh.gov.ph</td>
+                <td class="px-4 py-2">Government Agency</td>
+                <td class="px-4 py-2">2025-09-25</td>
+              </tr>
+              <tr class="border-t">
+                <td class="px-4 py-2">2</td>
+                <td class="px-4 py-2">COA</td>
+                <td class="px-4 py-2">auditor@coa.gov.ph</td>
+                <td class="px-4 py-2">Auditor</td>
+                <td class="px-4 py-2">2025-09-26</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+<script>
+  // Load sidebar dynamically
+  fetch("../../components/admin-sidebar.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("sidebar").innerHTML = html;
+    });
+</script>
+</body>
+</html>

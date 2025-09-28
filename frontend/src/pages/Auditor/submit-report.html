@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submit Report</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto place-items-center">
+      <h1 class="text-3xl font-bold mb-6">Submit Audit Report</h1>
+
+      <form class="bg-white p-6 rounded-lg shadow-md max-w-2xl space-y-4">
+        <div>
+          <label class="block font-semibold mb-2">Report Title</label>
+          <input type="text" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300" placeholder="e.g. Q3 Budget Audit for LGU Dagupan">
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-2">Agency / Project</label>
+          <input type="text" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300" placeholder="e.g. DPWH - Road Widening Project">
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-2">Report Summary</label>
+          <textarea class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300" rows="4" placeholder="Brief findings..."></textarea>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-2">Upload Report File (PDF/Doc)</label>
+          <input type="file" accept=".pdf,.doc,.docx" class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300">
+        </div>
+
+        <div class="flex justify-end">
+          <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Submit</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    fetch("../../components/auditor-sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar").innerHTML = html;
+      });
+  </script>
+</body>
+</html>

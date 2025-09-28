@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditor Profile</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold mb-6">Account Profile</h1>
+
+      <div class="bg-white p-6 rounded-lg shadow-md max-w-xl">
+        <p><strong>Organization:</strong> COA Region 1</p>
+        <p><strong>Email:</strong> auditor@coa.gov.ph</p>
+        <p><strong>Representative:</strong> Juan Dela Cruz</p>
+        <p><strong>Role:</strong> Auditor</p>
+        <p><strong>Contact:</strong> +63 912 345 6789</p>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    fetch("../../components/auditor-sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar").innerHTML = html;
+      });
+  </script>
+</body>
+</html>

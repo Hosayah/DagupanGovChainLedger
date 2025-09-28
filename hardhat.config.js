@@ -8,9 +8,9 @@ module.exports = {
         url: "http://127.0.0.1:7545",
         chainId: 1337,
         accounts: [
-          "0x090756889b386eb59db5b64f6770b9d360d063f2d13fc35592fd310a974b143f",
-          "0xe5d9f64a8e8d08704af0c1ee5a2f86c1c1fdddb16d1d9ec7dfdfeb415f09ab7f",
-          "0x274af4deee8cf033d711492898a00f10481fd04b25947d651b3c76b51e5f080a"
+          "0xbf876007d9d2b0dfa6001696366fdcfcd488c30ca27dbad5a68ccebed363b5e7",
+          "0x7c54ae0f05220a4f668f55f06465681e7867f3a2ba945bf81102ce3cb1bf2546",
+          "0xc060c2c38b3e423586f301b3f66106d057963ddcf56dcf0364f77ef28e280792"
         ] // optional
       }
     }

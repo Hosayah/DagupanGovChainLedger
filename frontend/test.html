@@ -1,13 +1,59 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="./output.css" rel="stylesheet">
+  <title>Government Spending Ledger</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <script type="module" src="./src/app.js"></script>
 </head>
 <body>
-  <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
+  <h1>📝 Government Spending Ledger</h1>
+
+  <!-- Wallet connection status -->
+  <p id="walletAddress">Not connected</p>
+
+  <hr>
+
+  <!-- Submit Spending Record -->
+  <h2>Add Spending Record</h2>
+  <label>Document Hash: <input type="text" id="docHash"></label><br>
+  <label>Record Type: <input type="text" id="recordType"></label><br>
+  <label>Amount: <input type="number" id="amount"></label><br>
+  <button onclick="addSpending()">Submit Spending</button>
+
+  <hr>
+
+  <!-- Submit Audit -->
+  <h2>Submit Audit</h2>
+  <label>Record ID: <input type="number" id="auditRecordId"></label><br>
+  <label>Notes: <input type="text" id="auditNotes"></label><br>
+  <button onclick="addAudit()">Submit Audit</button>
+
+  <hr>
+
+  <!-- Get Counts -->
+  <h2>Records Summary</h2>
+  <button onclick="getCounts()">Get Counts</button>
+  <pre id="counts"></pre>
+
+  <hr>
+  <div id="recordDisplay"></div>
+  <script>
+    function renderRecord(record) {
+      const container = document.getElementById("recordDisplay");
+      container.innerHTML = `
+        <div class="record-card">
+          <p><b>ID:</b> ${record.recordId}</p>
+          <p><b>Document Hash:</b> ${record.documentHash}</p>
+          <p><b>Type:</b> ${record.recordType}</p>
+          <p><b>Amount:</b> ${record.amount} ETH</p>
+          <p><b>Submitted By:</b> ${record.submittedBy}</p>
+          <p><b>Timestamp:</b> ${record.timestamp}</p>
+        </div>
+      `;
+    }
+  </script>
+  <input type="number" id="recordIdInput" placeholder="Enter Record ID">
+  <button onclick="fetchRecord(document.getElementById('recordIdInput').value)">Get Record</button>
 </body>
 </html>

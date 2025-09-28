@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Approval</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <!-- Include Admin Sidebar -->
+    <div id="sidebar"></div>
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+        <h1 class="text-3xl font-bold mb-6">Manage Roles</h1>
+
+        <div class="overflow-x-auto bg-white rounded-lg shadow-md">
+            <table class="min-w-full text-left">
+            <thead>
+                <tr class="bg-gray-200">
+                <th class="px-4 py-2">Account</th>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Current Role</th>
+                <th class="px-4 py-2">Change Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-t">
+                <td class="px-4 py-2">LGU Dagupan</td>
+                <td class="px-4 py-2">head@dagupan.gov.ph</td>
+                <td class="px-4 py-2">Budget Officer</td>
+                <td class="px-4 py-2">
+                    <select class="border rounded px-2 py-1">
+                    <option>Budget Officer</option>
+                    <option>Procurement Head</option>
+                    <option>Auditor</option>
+                    </select>
+                    <button class="ml-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Update</button>
+                </td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    </main>
+
+  </div>
+  <script>
+  // Load sidebar dynamically
+  fetch("../../components/admin-sidebar.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("sidebar").innerHTML = html;
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Approval</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <!-- Include Admin Sidebar -->
+    <div id="sidebar"></div>
+    <!-- Main Content -->
+  <main class="flex-1 p-6 overflow-y-auto">
+  <h1 class="text-3xl font-bold mb-6">Manage Accounts</h1>
+
+  <!-- Tabs -->
+  <div class="mb-4 flex space-x-4 border-b">
+    <button id="tabEnabled" class="px-4 py-2 border-b-2 border-blue-600 text-blue-600 font-semibold">Enabled</button>
+    <button id="tabDisabled" class="px-4 py-2 text-gray-600 hover:text-blue-600">Disabled</button>
+  </div>
+
+  <!-- Enabled Accounts -->
+  <div id="enabledAccounts">
+    <table class="min-w-full bg-white rounded-lg shadow-md text-left">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="px-4 py-2">Account Type</th>
+          <th class="px-4 py-2">Name</th>
+          <th class="px-4 py-2">Email</th>
+          <th class="px-4 py-2">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t">
+          <td class="px-4 py-2">Auditor</td>
+          <td class="px-4 py-2">COA Region 1</td>
+          <td class="px-4 py-2">auditor@coa.gov.ph</td>
+          <td class="px-4 py-2">
+            <button class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Disable</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <!-- Disabled Accounts -->
+    <div id="disabledAccounts" class="hidden">
+      <table class="min-w-full bg-white rounded-lg shadow-md text-left">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="px-4 py-2">Account Type</th>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t">
+            <td class="px-4 py-2">Gov Agency</td>
+            <td class="px-4 py-2">LGU Dagupan</td>
+            <td class="px-4 py-2">officer@dagupan.gov.ph</td>
+            <td class="px-4 py-2">
+              <button class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Enable</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+
+  </div>
+  <script>
+    const tabEnabled = document.getElementById("tabEnabled");
+    const tabDisabled = document.getElementById("tabDisabled");
+    const enabledAccounts = document.getElementById("enabledAccounts");
+    const disabledAccounts = document.getElementById("disabledAccounts");
+
+    tabEnabled.addEventListener("click", () => {
+      enabledAccounts.classList.remove("hidden");
+      disabledAccounts.classList.add("hidden");
+      tabEnabled.classList.add("border-b-2", "border-blue-600", "text-blue-600", "font-semibold");
+      tabDisabled.classList.remove("border-b-2", "border-blue-600", "text-blue-600", "font-semibold");
+      tabDisabled.classList.add("text-gray-600");
+    });
+
+    tabDisabled.addEventListener("click", () => {
+      disabledAccounts.classList.remove("hidden");
+      enabledAccounts.classList.add("hidden");
+      tabDisabled.classList.add("border-b-2", "border-blue-600", "text-blue-600", "font-semibold");
+      tabEnabled.classList.remove("border-b-2", "border-blue-600", "text-blue-600", "font-semibold");
+      tabEnabled.classList.add("text-gray-600");
+    });
+  </script>
+  <script>
+  // Load sidebar dynamically
+  fetch("../../components/admin-sidebar.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("sidebar").innerHTML = html;
+    });
+</script>
+</body>
+</html>

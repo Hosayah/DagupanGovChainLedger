@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Citizen Dashboard</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold mb-6">Citizen Dashboard</h1>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Total Projects</h2>
+          <p class="mt-2 text-2xl font-bold text-green-700">12</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Total Records</h2>
+          <p class="mt-2 text-2xl font-bold text-green-700">58</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-lg font-semibold">Reports Available</h2>
+          <p class="mt-2 text-2xl font-bold text-green-700">8</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    fetch("../../components/citizen-sidebar.html")
+      .then(res => res.text())
+      .then(html => document.getElementById("sidebar").innerHTML = html);
+  </script>
+</body>
+</html>

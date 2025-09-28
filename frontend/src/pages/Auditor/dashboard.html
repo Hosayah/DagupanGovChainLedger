@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auditor Dashboard</title>
+  <link href="../../../dist/output.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div id="sidebar"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+      <h1 class="text-3xl font-bold mb-6">Auditor Dashboard</h1>
+      
+      <!-- Example Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold">Total Transactions</h2>
+          <p class="mt-2 text-2xl font-bold text-blue-600">245</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold">Blocks Audited</h2>
+          <p class="mt-2 text-2xl font-bold text-green-600">35</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold">Pending Reviews</h2>
+          <p class="mt-2 text-2xl font-bold text-yellow-600">12</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Load sidebar dynamically
+    fetch("../../components/auditor-sidebar.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("sidebar").innerHTML = html;
+      });
+  </script>
+</body>
+</html>
