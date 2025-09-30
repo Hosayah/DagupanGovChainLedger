@@ -93,13 +93,9 @@
       tabEnabled.classList.add("text-gray-600");
     });
   </script>
-  <script>
-  // Load sidebar dynamically
-  fetch("../../components/admin-sidebar.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("sidebar").innerHTML = html;
-    });
-</script>
+  <script type="module">
+    import { loadSidebar } from "../../../assets/js/component-loader.js";
+    loadSidebar("sidebar"); // container id
+  </script>
 </body>
 </html>

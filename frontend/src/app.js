@@ -15,6 +15,7 @@ async function init() {
   const contractData = await fetch("./contract-address.json").then(res => res.json());
   const contractAddress = contractData.address;
 
+  console.log(abi);
   contract = new ethers.Contract(contractAddress, abi, signer);
   console.log(contractAddress);
   console.log(signer.getAddress());

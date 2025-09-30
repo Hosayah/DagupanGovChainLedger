@@ -1,5 +1,4 @@
 // assets/js/login.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
   const msg = document.getElementById("msg");
@@ -13,9 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -28,16 +28,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Store token if backend sends it
         if (data.token) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("role", data.role); // govagency, auditor, or citizen
+          //localStorage.setItem("token", data.token);
         }
 
-        // Redirect based on role
+        // Save role & account_type
+        if (data.user) {
+          localStorage.setItem("role", data.user.role);
+          localStorage.setItem("account_type", data.user.account_type);
+        }
+
+        // Redirect based on account_type (not role)
         setTimeout(() => {
-          if (data.role === "govagency") {
+          if (data.user.account_type === "agency") {
             window.location.href = "./src/pages/GovAgency/dashboard.html";
-          } else if (data.role === "auditor") {
+          } else if (data.user.account_type === "auditor") {
             window.location.href = "./src/pages/Auditor/dashboard.html";
+          } else if (data.user.account_type === "admin"){
+            window.location.href = "./src/pages/Admin/dashboard.html"
           } else {
             window.location.href = "./src/pages/Citizen/dashboard.html";
           }

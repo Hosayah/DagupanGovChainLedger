@@ -67,6 +67,7 @@ exports.register = (req, res) => {
 };
 
 // Login
+// Login
 exports.login = (req, res) => {
   const { email, password } = req.body;
 
@@ -77,14 +78,41 @@ exports.login = (req, res) => {
 
     const user = results[0];
 
-    if (!bcrypt.compareSync(password, user.password)) {
+    // Check account status
+    if (user.status === "pending") {
+      return res.status(403).json({ msg: "Your account is still pending approval." });
+    }
+    if (user.status === "rejected") {
+      return res.status(403).json({ msg: "Your account was rejected." });
+    }
+    if (user.status === "suspended") {
+      return res.status(403).json({ msg: "Your account is suspended." });
+    }
+
+    // Compare with password_hash
+    if (!bcrypt.compareSync(password, user.password_hash)) {
       return res.status(401).json({ msg: "Invalid credentials" });
     }
 
     // Store user in session
-    req.session.user = { id: user.id, type: user.user_type, name: user.name };
+    req.session.user = {
+      id: user.user_id,
+      account_type: user.account_type,
+      name: user.full_name,
+      role: user.role,
+      status: user.status
+    };
+    console.log(req.session.user);
     res.json({ msg: "Login successful", user: req.session.user });
   });
+};
+// Check current session
+exports.checkSession = (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  } else {
+    res.json({ loggedIn: false });
+  }
 };
 
 // Logout

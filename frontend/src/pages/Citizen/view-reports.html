@@ -37,10 +37,9 @@
       </div>
     </main>
   </div>
-  <script>
-    fetch("../../components/citizen-sidebar.html")
-      .then(res => res.text())
-      .then(html => document.getElementById("sidebar").innerHTML = html);
+  <script type="module">
+    import { loadSidebar } from "../../../assets/js/component-loader.js";
+    loadSidebar("sidebar"); // container id
   </script>
 </body>
 </html>
