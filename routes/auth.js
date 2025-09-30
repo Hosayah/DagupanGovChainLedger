@@ -4,7 +4,7 @@ const authController = require("../controllers/authController");
 
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-router.post("/logout", authController.logout);
+router.get("/logout", authController.logout);
 router.get("/me", (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Not logged in" });
