@@ -29,7 +29,7 @@
          <li class="pc-item"> <!-- Menu 01 -->
            <a href="../admin/template01.php" class="pc-link">
              <span class="pc-micon"><i data-feather="users"></i></span>
-             <span class="pc-mtext">Menu 01</span>
+             <span class="pc-mtext">Account approval</span>
            </a>
          </li>
 

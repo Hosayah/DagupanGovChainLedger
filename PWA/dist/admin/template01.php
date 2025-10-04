@@ -8,7 +8,7 @@
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
 <head>
-  <title>Template01</title>
+  <title>Account-approval</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -32,7 +32,7 @@
 </div>
 <!-- [ Pre-loader ] End -->
  <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/sidebar.php'; ?>
+  <?php include '../includes/admin-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
  <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>
@@ -45,11 +45,11 @@
       <div class="page-header">
         <div class="page-block">
           <div class="page-header-title">
-            <h5 class="mb-0 font-medium">Template 01</h5>
+            <h5 class="mb-0 font-medium">Account-approval</h5>
           </div>
           <ul class="breadcrumb">
             <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
-            <li class="breadcrumb-item" aria-current="page">Template 01</li>
+            <li class="breadcrumb-item" aria-current="page">Account-approval</li>
           </ul>
         </div>
       </div>
@@ -104,6 +104,114 @@
         </div>
         <!-- [ sample-page ] end -->
       </div>
+      <div class="col-span-12">
+            <div class="card table-card">
+              <div class="card-header">
+                <h5>Recent Requests</h5>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                    <tr class="bg-dark text-white text-center font-weight-bold">
+                      <th class="font-weight-bold">No</th>
+                      <th class="font-weight-bold">User Name</th>
+                      <th class="font-weight-bold">Entry Date</th>
+                      <th class="font-weight-bold">Action</th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                      </tr>
+                      <!-- person 1 start here -->
+                      <tr class="unread">
+                        <td>
+                          <img class="rounded-full max-w-10" style="width: 40px" src="../assets/images/user/avatar-1.jpg" alt="activity-user" />
+                        </td>
+                        <td>
+                          <h6 class="mb-1">Isabella Christensen</h6>
+                          <p class="m-0">Lorem Ipsum is simply dummy text of many text here for the template....</p>
+                        </td>
+                        <td>
+                          <h6 class="text-muted">
+                            <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                            11 MAY 12:56
+                          </h6>
+                        </td>
+                        <td>
+                          <a href="#!" class="badge bg-theme-bg-2 text-white text-[12px] mx-2">Reject</a>
+                          <a href="#!" class="badge bg-theme-bg-1 text-white text-[12px]">Approve</a>
+                        </td>
+                      </tr>  <!-- person 1 ends here -->
+
+                      <!-- person 2 start here -->
+                      <tr class="unread">
+                        <td>
+                          <img class="rounded-full max-w-10" style="width: 40px" src="../assets/images/user/avatar-2.jpg" alt="activity-user" />
+                        </td>
+                        <td>
+                          <h6 class="mb-1">Mathilde Andersen</h6>
+                          <p class="m-0">Lorem Ipsum is simply dummy text of many text here for the template....</p>
+                        </td>
+                        <td>
+                          <h6 class="text-muted">
+                            <i class="fas fa-circle text-danger text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                            11 MAY 10:35
+                          </h6>
+                        </td>
+                        <td>
+                          <a href="#!" class="badge bg-theme-bg-2 text-white text-[12px] mx-2">Reject</a>
+                          <a href="#!" class="badge bg-theme-bg-1 text-white text-[12px]">Approve</a>
+                        </td>
+                      </tr>  <!-- person 2 ends here -->
+
+                      <!-- person 3 start here -->
+                      <tr class="unread">
+                        <td>
+                          <img class="rounded-full max-w-10" style="width: 40px" src="../assets/images/user/avatar-3.jpg" alt="activity-user" />
+                        </td>
+                        <td>
+                          <h6 class="mb-1">Karla Sorensen</h6>
+                          <p class="m-0">Lorem Ipsum is simply dummy text of many text here for the template....</p>
+                        </td>
+                        <td>
+                          <h6 class="text-muted">
+                            <i class="fas fa-circle text-success text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                            9 MAY 17:38
+                          </h6>
+                        </td>
+                        <td>
+                          <a href="#!" class="badge bg-theme-bg-2 text-white text-[12px] mx-2">Reject</a>
+                          <a href="#!" class="badge bg-theme-bg-1 text-white text-[12px]">Approve</a>
+                        </td>
+                      </tr>  <!-- person 3 ends here -->
+                      
+                      <!-- person 4 start here -->
+                      <tr class="unread">
+                        <td>
+                          <img class="rounded-full max-w-10" style="width: 40px" src="../assets/images/user/avatar-1.jpg" alt="activity-user" />
+                        </td>
+                        <td>
+                          <h6 class="mb-1">Ida Jorgensen</h6>
+                          <p class="m-0">Lorem Ipsum is simply dummy text of many text here for the template....</p>
+                        </td>
+                        <td>
+                          <h6 class="text-muted f-w-300">
+                            <i class="fas fa-circle text-danger text-[10px] ltr:mr-4 rtl:ml-4"></i>
+                            19 MAY 12:56
+                          </h6>
+                        </td>
+                        <td>
+                          <a href="#!" class="badge bg-theme-bg-2 text-white text-[12px] mx-2">Reject</a>
+                          <a href="#!" class="badge bg-theme-bg-1 text-white text-[12px]">Approve</a>
+                        </td>
+                      </tr> <!-- person 4 ends here -->
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
       <!-- [ Main Content ] end -->
     </div>
   </div>

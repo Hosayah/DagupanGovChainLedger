@@ -13,7 +13,6 @@ if (mysqli_connect_errno()) {
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "Connection Success";
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }

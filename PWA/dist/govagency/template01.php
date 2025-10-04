@@ -1,14 +1,14 @@
 <?php
-session_start();
-if (isset($_POST['submit'])) {
-} else {
+  session_start();
+  if(isset($_POST['submit'])){
+
+  } else {
 
 ?>
-  <!doctype html>
-  <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
-
-  <head>
-    <title>Dashboard</title>
+<!doctype html>
+<html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
+<head>
+  <title>Template01</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -22,84 +22,89 @@ if (isset($_POST['submit'])) {
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
-  </head>
+</head>
+<body>
+  <!-- [ Pre-loader ] start -->
+<div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
+  <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
+    <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+  </div>
+</div>
+<!-- [ Pre-loader ] End -->
+ <!-- [ Sidebar Menu ] start -->
+  <?php include '../includes/admin-sidebar.php'; ?>
+<!-- [ Sidebar Menu ] end -->
+ <!-- [ Header Topbar ] start -->
+  <?php include '../includes/header.php'; ?>
+<!-- [ Header ] end -->
 
-  <body>
-    <!-- [ Pre-loader ] start -->
-    <div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
-      <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0">
-        <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 animate-[hitZak_0.6s_ease-in-out_infinite_alternate]"></div>
+  <!-- [ Main Content ] start -->
+  <div class="pc-container">
+    <div class="pc-content">
+      <!-- [ breadcrumb ] start -->
+      <div class="page-header">
+        <div class="page-block">
+          <div class="page-header-title">
+            <h5 class="mb-0 font-medium">Template 01</h5>
+          </div>
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page">Template 01</li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <!-- [ Pre-loader ] End -->
+      <!-- [ breadcrumb ] end -->
 
-    <!-- [ Sidebar Menu ] start -->
-    <?php include '../includes/admin-sidebar.php'; ?>
-    <!-- [ Sidebar Menu ] end -->
-    <!-- [ Header Topbar ] start -->
-    <?php include '../includes/header.php'; ?>
-    <!-- [ Header ] end -->
-
-    <!-- [ Main Content ] start -->
-    <div class="pc-container">
-      <div class="pc-content">
-        <!-- [ breadcrumb ] start -->
-        <div class="page-header">
-          <div class="page-block">
-            <div class="page-header-title">
-              <h5 class="mb-0 font-medium">Dashboard</h5>
+      <!-- [ Main Content ] start -->
+      <div class="grid grid-cols-12 gap-x-6">
+        <!-- [ sample-page ] start -->
+        <div class="col-span-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>Title Head Here</h5>
             </div>
-            <ul class="breadcrumb">
-              <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
-              <!-- <li class="breadcrumb-item"><a href="javascript: void(0)">Dashboard</a></li> -->
-              <li class="breadcrumb-item" aria-current="page">Dashboard</li>
-            </ul>
+            <div class="card-body">
+              <form class="form-horizontal"> <!-- Form elements -->
+                <table class="table table-striped table-bordered">
+                  <thead>
+                    <tr class="bg-dark text-white text-center font-weight-bold">
+                      <th class="font-weight-bold">No</th>
+                      <th class="font-weight-bold">User Name</th>
+                      <th class="font-weight-bold">Fullname</th>
+                      <th class="font-weight-bold">Contact Number</th>
+                      <th class="font-weight-bold">Email</th>
+                      <th class="font-weight-bold">Entry Date</th>
+                      <th class="font-weight-bold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="text-center">1</td>
+                      <td class="text-center">admin</td>
+                      <td class="text-center">Administrator</td>
+                      <td class="text-center">1234567890</td>
+                      <td class="text-center">admin@example.com</td>
+                      <td class="text-center">2023-01-01</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-warning btn-sm">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="flex mt-1 justify-between items-center flex-wrap">
+                  <div class="form-check">
+                    <button type="button" class="btn btn-primary mx-auto shadow-2xl"><a href="#">Button 1</a></button>
+                    <button type="button" class="btn btn-warning mx-auto shadow-2xl"><a href="#">Button 2</a></button>
+                  </div>
+                </div>
+              </form> <!-- Form ends -->
+            </div>
           </div>
         </div>
-        <!-- [ breadcrumb ] end -->
-
-        <!-- [ Main Content ] start -->
-        <div class="grid grid-cols-12 gap-x-6">
-          <div class="col-span-12 xl:col-span-6 md:col-span-6">
-            <div class="card">
-              <div class="card-header !pb-0 !border-b-0">
-                <h5>This is Daily Sales</h5>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    <i class="feather icon-arrow-up text-success-500 text-[30px] mr-1.5"></i>$ 249.95
-                  </h3>
-                  <p class="mb-0">67%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: 75%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-span-12 xl:col-span-6 md:col-span-6">
-            <div class="card">
-              <div class="card-header !pb-0 !border-b-0">
-                <h5>This is Monthly Sales</h5>
-              </div>
-              <div class="card-body">
-                <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    <i class="feather icon-arrow-down text-danger-500 text-[30px] mr-1.5"></i>$ 2.942.32
-                  </h3>
-                  <p class="mb-0">36%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: 35%"></div>
-                </div>
-              </div>
-            </div>
-          </div>
- 
-          <div class="col-span-12">
+        <!-- [ sample-page ] end -->
+      </div>
+      <div class="col-span-12">
             <div class="card table-card">
               <div class="card-header">
                 <h5>Recent Users</h5>
@@ -107,7 +112,16 @@ if (isset($_POST['submit'])) {
               <div class="card-body">
                 <div class="table-responsive">
                   <table class="table table-hover">
+                    <thead>
+                    <tr class="bg-dark text-white text-center font-weight-bold">
+                      <th class="font-weight-bold">No</th>
+                      <th class="font-weight-bold">User Name</th>
+                      <th class="font-weight-bold">Entry Date</th>
+                      <th class="font-weight-bold">Action</th>
+                    </tr>
+                  </thead>
                     <tbody>
+                      </tr>
                       <!-- person 1 start here -->
                       <tr class="unread">
                         <td>
@@ -198,35 +212,21 @@ if (isset($_POST['submit'])) {
               </div>
             </div>
           </div>
-        </div>
-        <!-- [ Main Content ] end -->
-      </div>
+      <!-- [ Main Content ] end -->
     </div>
-    <!-- [ Main Content ] end -->
-    <?php include '../includes/footer.php'; ?>
+  </div>
+  <!-- [ Main Content ] end -->
 
-    <!-- Required Js -->
-    <script src="../assets/js/plugins/simplebar.min.js"></script>
-    <script src="../assets/js/plugins/popper.min.js"></script>
-    <script src="../assets/js/icon/custom-icon.js"></script>
-    <script src="../assets/js/plugins/feather.min.js"></script>
-    <script src="../assets/js/component.js"></script>
-    <script src="../assets/js/theme.js"></script>
-    <script src="../assets/js/script.js"></script>
-    <div class="floting-button fixed bottom-[50px] right-[30px] z-[1030]">
-    </div>
+<!-- Required Js -->
+<script src="../assets/js/plugins/simplebar.min.js"></script>
+<script src="../assets/js/plugins/popper.min.js"></script>
+<script src="../assets/js/icon/custom-icon.js"></script>
+<script src="../assets/js/plugins/feather.min.js"></script>
+<script src="../assets/js/component.js"></script>
+<script src="../assets/js/theme.js"></script>
+<script src="../assets/js/script.js"></script>
 
-    <script>
-      layout_change('false');
-      layout_theme_sidebar_change('dark');
-      change_box_container('false');
-      layout_caption_change('true');
-      layout_rtl_change('false');
-      preset_change('preset-1');
-      main_layout_change('vertical');
-    </script>
-  </body>
-  <!-- [Body] end -->
-
-  </html>
+<?php include '../includes/footer.php'; ?>
+</body>
+</html>
 <?php } ?>

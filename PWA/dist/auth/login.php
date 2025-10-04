@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <p class="mt-4 text-sm text-gray-600">
       Don’t have an account?
-      <a href="./registration.html" class="text-green-600 hover:underline">Register here</a>
+      <a href="./registration.php" class="text-green-600 hover:underline">Register here</a>
     </p>
   </div>
 </body>
