@@ -31,6 +31,6 @@ export async function loadSidebar(containerId) {
   } catch (err) {
     console.error("Sidebar load error:", err);
     // fallback: redirect to login if unauthorized
-    window.location.href = "../../../index.html";
+    window.location.href = "../../../index.html";k
   }
 }

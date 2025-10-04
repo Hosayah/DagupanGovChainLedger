@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
           } else if (data.user.account_type === "admin"){
             window.location.href = "./src/pages/Admin/dashboard.html"
           } else {
-            window.location.href = "./src/pages/Citizen/dashboard.html";
+            window.location.href = "../Citizen/dashboard.html";
           }
         }, 1500);
       } else {
