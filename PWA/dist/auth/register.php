@@ -55,10 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $msg = "✅ Agency registered successfully.";
                 } elseif ($user_type === "auditor") {
                     $auditorStmt = $conn->prepare("
-                        INSERT INTO auditors (user_id, organization_name, accreditation_number)
+                        INSERT INTO auditors (user_id, organization_name, office_code, accreditation_number)
                         VALUES (?, ?, ?)
                     ");
-                    $auditorStmt->bind_param("iss", $userId, $name, $accreditation);
+                    $auditorStmt->bind_param("iss", $userId, $name, $officeCode, $accreditation);
                     $auditorStmt->execute();
                     $msg = "✅ Auditor registered successfully.";
                 } elseif ($user_type === "citizen") {
@@ -121,6 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <form id="auditor-form" class="tab-content hidden" method="POST">
         <input type="hidden" name="user_type" value="auditor">
         <input type="text" name="name" placeholder="Organization Name" class="w-full p-2 border rounded mb-2" required>
+        <input type="text" name="officeCode" placeholder="Office/Department Code" class="w-full p-2 border rounded mb-2" required>
         <input type="text" name="accreditation" placeholder="Accreditation/License Number" class="w-full p-2 border rounded mb-2" required>
         <input type="email" name="email" placeholder="Official Email" class="w-full p-2 border rounded mb-2" required>
         <input type="text" name="fullName" placeholder="Representative Name" class="w-full p-2 border rounded mb-2" required>

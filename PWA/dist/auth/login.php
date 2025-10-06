@@ -39,21 +39,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     // Store user session
                     $_SESSION['user'] = [
                         'id' => $user['user_id'],
+                        'email'=> $user['email'],
                         'account_type' => $user['account_type'],
                         'name' => $user['full_name'],
                         'role' => $user['role'],
                         'status' => $user['status']
                     ];
+                    if ($user['account_type'] === 'admin') {
+                        $stmt2 = $conn->prepare("SELECT access_level FROM admins WHERE user_id = ?");
+                        $stmt2->bind_param("i", $user['user_id']);
+                        $stmt2->execute();
+                        $admin = $stmt2->get_result()->fetch_assoc();
+                        $_SESSION['user']['access_level'] = $admin['access_level'] ?? 'review_admin';
+                    }
 
                     // Redirect based on account type
                     if ($user['account_type'] === 'agency') {
-                        header("Location: ../../GovAgency/dashboard.html");
+                        header("Location: ../govagency/dashboard.php");
                         exit;
                     } elseif ($user['account_type'] === 'auditor') {
-                        header("Location: ../../Auditor/dashboard.html");
+                        header("Location: ../auditor/dashboard.php");
                         exit;
                     } elseif ($user['account_type'] === 'admin') {
-                        header("Location: ../../Admin/dashboard.html");
+                        header("Location: ../admin/dashboard.php");
                         exit;
                     } else {
                         header("Location: ../admin/dashboard.php");
@@ -98,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <p class="mt-4 text-sm text-gray-600">
       Don’t have an account?
-      <a href="./registration.php" class="text-green-600 hover:underline">Register here</a>
+      <a href="./register.php" class="text-green-600 hover:underline">Register here</a>
     </p>
   </div>
 </body>

@@ -546,7 +546,7 @@ b, strong{
   z-index: 1025;
   display: flex;
   height: 74px;
-  background-color: rgb(189 188 185 / var(--tw-bg-opacity)); /* rgba( 244,247,250, 0.7); sniper 2025 */
+  background-color: var(--color-theme-headerbg); /* rgba( 244,247,250, 0.7); sniper 2025 */
   --tw-text-opacity: 1;
   color: rgb(91 107 121 / var(--tw-text-opacity));
   --tw-backdrop-blur: blur(7px);

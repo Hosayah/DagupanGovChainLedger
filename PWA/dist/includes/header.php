@@ -1,4 +1,13 @@
 <!-- [ Header Topbar ] start -->
+<?php 
+ if (!isset($_SESSION['user'])) {
+    header("Location: ../../auth/login.php");
+    exit;
+  } 
+  $name = $_SESSION["user"]["name"];
+  $email = $_SESSION["user"]["email"];
+
+?>
 <header class="pc-header">
   <div class="header-wrapper flex max-sm:px-[15px] px-[25px] grow">
     <!-- [Mobile Media Block] start -->
@@ -66,9 +75,9 @@
                 <div class="shrink-0">
                   <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="w-10 rounded-full" />
                 </div>
-                <div class="grow ms-4">
-                  <h4 class="mb-1 text-white">Administrator</h4>
-                  <span class="text-white">admin@company.io</span>
+                <div class="grow ms-3">
+                  <h4 class="mb-1 text-white"><?= htmlspecialchars($name) ?></h4>
+                  <span class="text-white"><?= htmlspecialchars($email) ?></span>
                 </div>
               </div>
             </div>
@@ -102,7 +111,7 @@
                     <svg class="pc-icon me-2 w-[22px] h-[22px]">
                       <use xlink:href="#custom-logout-1-outline"></use>
                     </svg>
-                    <a href="./logout.php">Log-Out</a>
+                    <a href="../auth/logout.php">Log-Out</a>
                   </button>
                 </div>
               </div>
