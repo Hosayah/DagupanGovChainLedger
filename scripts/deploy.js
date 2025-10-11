@@ -46,7 +46,7 @@ async function main() {
     JSON.stringify({ address: contractAddress }, null, 2)
   );
 
-  console.log("ABI and contract address saved to frontend/");
+  console.log("ABI and contract address saved to services/");
 }
 
 main().catch((error) => {

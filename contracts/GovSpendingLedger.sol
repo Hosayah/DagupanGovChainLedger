@@ -88,9 +88,20 @@ contract GovSpendingLedger is AccessControl {
     // ---------------------------
     // View Spending Records & Audits
     // ---------------------------
-    function getRecord(uint256 recordId) public view returns (SpendingRecord memory) {
-        require(recordId > 0 && recordId <= recordCount, "Record does not exist");
-        return spendingRecords[recordId];
+    function getRecordBasic(uint256 recordId)
+        public
+        view
+        returns (
+            uint256,
+            bytes32,
+            string memory,
+            uint256,
+            address,
+            uint256
+        )
+    {
+        SpendingRecord memory r = spendingRecords[recordId];
+        return (r.recordId, r.documentHash, r.recordType, r.amount, r.submittedBy, r.timestamp);
     }
 
     function getAudits(uint256 recordId) public view returns (AuditFinding[] memory) {

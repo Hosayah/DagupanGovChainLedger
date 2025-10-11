@@ -1,0 +1,18 @@
+{
+    "name": "josiahdaniel/gov-spending-ledger",
+    "autoload": {
+        "psr-4": {
+            "Josiahdaniel\\GovSpendingLedger\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Hosayah",
+            "email": "catabayjosiah19@gmail.com"
+        }
+    ],
+    "require": {
+        "sc0vu/web3.php": "^0.1.4",
+        "kornrunner/keccak": "^1.1"
+    }
+}
