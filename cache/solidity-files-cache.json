@@ -262,8 +262,8 @@
       ]
     },
     "C:\\xampp\\htdocs\\GovSpendingLedger\\contracts\\GovSpendingLedger.sol": {
-      "lastModificationDate": 1760358455721,
-      "contentHash": "bd6492a9de89d1ddba0be37ae674f7ed",
+      "lastModificationDate": 1760536618948,
+      "contentHash": "69aec3e6e9bd46934f92578fafc7e62b",
       "sourceName": "contracts/GovSpendingLedger.sol",
       "solcConfig": {
         "version": "0.8.28",

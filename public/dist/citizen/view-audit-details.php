@@ -7,6 +7,7 @@ include("../../../DAO/RecordDao.php");
 include("../../../DAO/AuditDao.php");
 include("../../../DAO/UserDao.php");
 include("../../../services/IpfsUploader.php");
+include("../../../services/blockchain.php");
 
 $jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; 
 $ipfsUploader = new PinataUploader($jwt);
@@ -26,13 +27,34 @@ if ($action != 'edit') {
     die("Invalid action.");
 }
 
+$userName = $_SESSION["user"]["name"];
 $result = $auditDao->getAuditById($audit_id) ?? [];
 $auditor = $userDao->getUserByIdFromAuditor($result["audit_by"]);
+$block = getAuditsAsArray($contract, $result['record_id']);
 //$record = $recordDao->getRecordByProjectId($result['record_id']) ?? [];
 $type = $result['type'] ??'';
 $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
+$pdf_data = file_get_contents($link);
+$temp_pdf = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+file_put_contents($temp_pdf, $pdf_data);
 
+// Path to Poppler binary (if not in PATH)
+$poppler_path = "C:\\poppler-25.07.0\\Library\\bin\\pdftotext.exe";
 
+// Output file
+$output_txt = $temp_pdf . ".txt";
+
+// Execute Poppler command
+exec("\"$poppler_path\" \"$temp_pdf\" \"$output_txt\"");
+
+// Read the extracted text
+$text = file_get_contents($output_txt);
+
+$context = $text . '<br>'. 
+print_r( $result, true) . '<br> ' . 
+print_r( $auditor, true) .'<br>Blockchain details:' .
+print_r( $block[$audit_id-1], true) .'<br>';
+//echo $context;
 ?>
 
 <!doctype html>
@@ -52,6 +74,8 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link rel="stylesheet" href="../assets/css/chatbox.css" id="main-style-link" />
+    <link rel="stylesheet" href="../assets/css/landing-page.css" id="main-style-link" />
     <link
       rel="stylesheet"
       type="text/css"
@@ -100,7 +124,7 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
       <!-- [ Main Content ] start -->
       <div class="grid grid-cols-12 gap-x-6">
         <!-- [ sample-page ] start -->
-        <div class="col-span-12 md:col-span-6">
+        <div class="col-span-12">
           <div class="card">
             <div class="card-header">
               <h5>Audit Basic Details</h5>
@@ -108,9 +132,9 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
             <div class="card-body">
               <dl class="grid grid-cols-12 gap-6">
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Audit Title:</dt>
-                <dd class="col-span-12 sm:col-span-9">AU-ID-<?= htmlspecialchars($result['title'])?></dd>
+                <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($result['title'])?></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Audit Summary:</dt>
-                <dd class="col-span-12 sm:col-span-9 min-w-0 max-w-[16rem] break-all whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['summary'])?></textarea></dd>
+                <dd class="col-span-12 sm:col-span-9 break-after-auto whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['summary'])?></textarea></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Office Name:</dt>
                 <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($auditor['organization_name'])?></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Office Code:</dt>
@@ -121,7 +145,7 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
             </div>
           </div>
         </div>
-        <div class="col-span-12 md:col-span-6">
+        <div class="col-span-12">
           <div class="card">
             <div class="card-header">
               <h5>Final Report/Audit Immutable Details</h5>
@@ -149,12 +173,20 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
         <div class="col-span-12">
           <div class="card">
             <div class="card-header">
-              <h5>AI Overview</h5>
+              <h5>AI Assitant</h5>
             </div>
             <div class="card-body">
-              <p class="text-md text-gray-700 mb-3">
-                The Dagupan River Flood Control Improvement Project is a strategic initiative by the Department of Public Works and Highways (DPWH) aimed at strengthening flood protection infrastructure along the Pantal and Calmay Rivers in Dagupan City, Pangasinan. This project was developed in response to the city’s recurring flooding issues that have historically impacted both commercial and residential areas.
-              </p>
+              <section class="landing" id="landingSection">
+                  <div class="landing-content">
+                      <h1>Hola, <?= htmlspecialchars($userName)?></h1>
+                      <p class="subtext">Welcome to DagupanGovLegder ChatBot</p>
+                  </div>
+              </section>
+              <div class="chat-area" id="chatArea" style="display: none;"></div>
+              <div class="flex">
+                  <input type="text" id="userInput" class="form-control w-full" placeholder="Type your message..." />
+                  <button id="sendBtn" class="btn btn-success">Send</button>
+              </div>
             </div>
           </div>
         </div>
@@ -174,7 +206,11 @@ window.addEventListener("load", function() {
   });
 });
 </script>
-
+<script>
+  // Pass extracted text to chatbot.js safely
+  const pdfContext = <?= json_encode($context) ?>;
+</script>
+<script src="../../../services/chatbox.js"></script>
 <script src="../assets/js/plugins/simplebar.min.js"></script>
 <script src="../assets/js/plugins/popper.min.js"></script>
 <script src="../assets/js/icon/custom-icon.js"></script>

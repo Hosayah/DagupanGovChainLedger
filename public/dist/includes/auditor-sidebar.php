@@ -17,8 +17,7 @@
      </div>
      <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
        <div class="shrink-0 flex items-center justify-left mb-5">&nbsp;&nbsp;&nbsp;&nbsp;
-         <h5 class="text-left text-white font-medium text-[15px] flex items-center gap-2">
-          Hello,&nbsp;
+         <h5 class="text-center font-medium text-[15px] flex items-center gap-2">
            <?= htmlspecialchars($name) ?>
          </h5>
        </div>

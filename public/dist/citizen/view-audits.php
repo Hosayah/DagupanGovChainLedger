@@ -13,7 +13,8 @@
   $limit = $_SESSION['limit'];
   $user_id = $_SESSION["user"]["id"];
   $auditDao = new AuditDAO($conn);
-  $auditList = $auditDao->getAllAudit($limit);
+  $search_term = $_GET['search_term'] ?? '';
+  $auditList = $auditDao->getAllAuditWithSearch($limit, $search_term);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -80,8 +81,13 @@
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
-              <h5>View Audits</h5>
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">Audits List</h5>
+              <form method="GET" id="filterForm">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title, category, or description"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
@@ -123,7 +129,7 @@
                             <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0">USER-ID<?= htmlspecialchars($row['audit_by']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">

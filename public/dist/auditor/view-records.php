@@ -13,7 +13,8 @@
   $limit = $_SESSION['limit'];
   //$user_id = $_SESSION["user"]["id"];
   $RecordDao = new RecordDAO($conn);
-  $RecordsList = $RecordDao->getAllRecords($limit);
+  $search_term = $_GET['search_term'] ?? '';
+  $RecordsList = $RecordDao->getAllRecordsWithSearch($limit, $search_term);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -80,17 +81,17 @@
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
-              <h5>View Records</h5>
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">Records List</h5>
+              <form method="GET" id="filterForm">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title, category, or description"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
-                <div class="mb-3 flex">
-                  <form action="" method="GET">
-                    <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                    <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                  </form>
-                </div>
+                
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
                       <p style="text-align:center; color:green; font-weight:bold;">
@@ -102,13 +103,11 @@
                     <thead>
                     <tr class="bg-dark text-white text-center font-weight-bold">
                       <th class="font-weight-bold">Record ID</th>
-                      <th class="font-weight-bold">Project ID</th>
+                      <th class="font-weight-bold">Title</th>
                       <th class="font-weight-bold">Type</th>
                       <th class="font-weight-bold">Amount</th>
-                      <th class="font-weight-bold">Doc. Hash</th>
                       <th class="font-weight-bold">Submitted By</th>
                       <th class="font-weight-bold">Submitted at</th>
-                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -116,10 +115,10 @@
                       <?php while ($row = $RecordsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['record_id']) ?></h6>
+                            <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['project_id']) ?></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['project_title']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-1"><?= htmlspecialchars($row['record_type']) ?></h6>
@@ -128,23 +127,13 @@
                             <h6 class="mb-0"><?= htmlspecialchars($row['amount']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['document_hash']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['submitted_by']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['submitted_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
                               <i class="fas fa-circle text-warning-500 text-[10px] ltr:mr-4 rtl:ml-4"></i>
                               <?= htmlspecialchars($row['submitted_at']) ?>
                             </h6>
-                          </td>
-                          <td>
-                            <a href="./controller/update-status.php?id=<?= $row['project_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              View
-                            </a>
                           </td>
                         </tr>
                       <?php endwhile; ?>

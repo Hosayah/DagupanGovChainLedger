@@ -13,7 +13,8 @@
   $limit = $_SESSION['limit'];
   //$user_id = $_SESSION["user"]["id"];
   $RecordDao = new RecordDAO($conn);
-  $RecordsList = $RecordDao->getAllRecords($limit);
+  $search_term = $_GET['search_term'] ?? '';
+  $RecordsList = $RecordDao->getAllRecordsWithSearch($limit, $search_term);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -80,8 +81,13 @@
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
-              <h5>View Records</h5>
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">Records List</h5>
+              <form method="GET" id="filterForm">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title, category, or description"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
@@ -96,10 +102,9 @@
                     <thead>
                     <tr class="bg-dark text-white text-center font-weight-bold">
                       <th class="font-weight-bold">Record ID</th>
-                      <th class="font-weight-bold">Project ID</th>
+                      <th class="font-weight-bold">Project Title</th>
                       <th class="font-weight-bold">Type</th>
                       <th class="font-weight-bold">Amount</th>
-                      <th class="font-weight-bold">Doc. Hash</th>
                       <th class="font-weight-bold">Submitted By</th>
                       <th class="font-weight-bold">Submitted at</th>
                     </tr>
@@ -112,16 +117,13 @@
                             <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['project_title']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-1"><?= htmlspecialchars($row['record_type']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-0"><?= htmlspecialchars($row['amount']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['blockchain_tx']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['submitted_by']) ?></h6>

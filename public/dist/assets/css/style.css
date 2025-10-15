@@ -2549,7 +2549,7 @@ text:is([data-pc-theme="dark"] *),.apexcharts-theme-light .apexcharts-menu-icon:
 }
 .form-control,.datatable-input{
   display: block;
-  width: 50%;
+  width: 100%;
   border-radius: 0.25rem;
   border-width: 1px;
   --tw-border-opacity: 1;

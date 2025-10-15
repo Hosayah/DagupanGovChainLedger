@@ -4,7 +4,6 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract GovSpendingLedger is AccessControl {
-
     // ---------------------------
     // Roles
     // ---------------------------
@@ -23,7 +22,6 @@ contract GovSpendingLedger is AccessControl {
         uint256 recordId;
         bytes32 documentHash; // Hash of contract/invoice/budget file
         string recordType;    // "budget", "invoice", "contract"
-        //uint256 amount;
         address submittedBy;
         uint256 timestamp;
     }
@@ -35,6 +33,7 @@ contract GovSpendingLedger is AccessControl {
     // Audit Workflow Struct & Storage
     // ---------------------------
     enum AuditResult { PASSED, FLAGGED, REJECTED }
+
     struct AuditFinding {
         uint256 recordId;
         bytes32 documentHash;
@@ -48,8 +47,18 @@ contract GovSpendingLedger is AccessControl {
     // ---------------------------
     // Events
     // ---------------------------
-    event RecordSubmitted(uint256 indexed recordId, address indexed submittedBy, bytes32 documentHash);
-    event AuditSubmitted(uint256 indexed recordId, address indexed auditor, bytes32 documenHash);
+    event RecordSubmitted(
+        uint256 indexed recordId,
+        address indexed submittedBy,
+        bytes32 documentHash
+    );
+
+    event AuditSubmitted(
+        uint256 indexed recordId,
+        address indexed auditor,
+        bytes32 documentHash,
+        AuditResult result
+    );
 
     // ---------------------------
     // Submit Spending Records
@@ -57,39 +66,45 @@ contract GovSpendingLedger is AccessControl {
     function submitSpendingRecord(
         bytes32 documentHash,
         string memory recordType
-        //uint256 amount
     ) public onlyRole(GOV_AGENCY_ROLE) {
         recordCount += 1;
+
         spendingRecords[recordCount] = SpendingRecord({
             recordId: recordCount,
             documentHash: documentHash,
             recordType: recordType,
-            //amount: amount,
             submittedBy: msg.sender,
             timestamp: block.timestamp
         });
 
         emit RecordSubmitted(recordCount, msg.sender, documentHash);
     }
-    
+
     // ---------------------------
     // Submit Audit Findings
     // ---------------------------
-    function submitAudit(uint256 recordId, bytes32 documentHash, AuditResult result) public onlyRole(AUDITOR_ROLE) {
+    function submitAudit(
+        uint256 recordId,
+        bytes32 documentHash,
+        AuditResult result
+    ) public onlyRole(AUDITOR_ROLE) {
         require(recordId > 0 && recordId <= recordCount, "Record does not exist");
-        auditFindings[recordId].push(AuditFinding({
-            recordId: recordId,
-            documentHash: documentHash,
-            result: result,
-            auditor: msg.sender,
-            timestamp: block.timestamp
-        }));
 
-        emit AuditSubmitted(recordId, msg.sender, documentHash);
+        auditFindings[recordId].push(
+            AuditFinding({
+                recordId: recordId,
+                documentHash: documentHash,
+                result: result,
+                auditor: msg.sender,
+                timestamp: block.timestamp
+            })
+        );
+
+        emit AuditSubmitted(recordId, msg.sender, documentHash, result);
     }
 
     // ---------------------------
-    // View Spending Records & Audits
+    // View Spending Records
     // ---------------------------
     function getRecordBasic(uint256 recordId)
         public
@@ -98,7 +113,6 @@ contract GovSpendingLedger is AccessControl {
             uint256,
             bytes32,
             string memory,
-            //uint256,
             address,
             uint256
         )
@@ -107,12 +121,31 @@ contract GovSpendingLedger is AccessControl {
         return (r.recordId, r.documentHash, r.recordType, r.submittedBy, r.timestamp);
     }
 
-    function getAudits(uint256 recordId) public view returns (AuditFinding[] memory) {
+    // ---------------------------
+    // View Audit Findings
+    // ---------------------------
+    function getAuditAt(uint256 recordId, uint256 index)
+        public
+        view
+        returns (
+            uint256,
+            bytes32,
+            AuditResult,
+            address,
+            uint256
+        )
+    {
         require(recordId > 0 && recordId <= recordCount, "Record does not exist");
-        return auditFindings[recordId];
+        require(index < auditFindings[recordId].length, "Index out of range");
+
+        AuditFinding memory a = auditFindings[recordId][index];
+        return (a.recordId, a.documentHash, a.result, a.auditor, a.timestamp);
     }
 
-    // ✅ New helper functions
+
+    // ---------------------------
+    // Helper Getters
+    // ---------------------------
     function getSpendingCount() public view returns (uint256) {
         return recordCount;
     }
@@ -123,11 +156,12 @@ contract GovSpendingLedger is AccessControl {
     }
 
     // ---------------------------
-    // Role Management (Optional)
+    // Role Management
     // ---------------------------
     function addGovAgency(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(GOV_AGENCY_ROLE, account);
     }
+
     function addAuditor(address account) public onlyRole(DEFAULT_ADMIN_ROLE) {
         grantRole(AUDITOR_ROLE, account);
     }

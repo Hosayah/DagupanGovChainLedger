@@ -17,6 +17,36 @@ class AuditDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result; 
     }
+    public function getAllAuditWithSearch($limit = 0, $search_term = ''): mixed
+    {
+        // Base SQL
+        $sql = "SELECT * FROM audits WHERE 1=1";
+        $params = [];
+        $types = "";
+
+        // ✅ Add search filter only if search term is provided
+        if (!empty($search_term)) {
+            $sql .= " AND (title LIKE ? OR result LIKE ? OR audit_by LIKE ?)";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "sss";
+        }
+
+        // ✅ Add pagination (limit & offset)
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // Prepare and bind
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
 
     public function getAuditByUserId($id, $limit = 0): mixed {
         $sql = "
@@ -28,6 +58,51 @@ class AuditDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result; 
     }
+    public function getAuditByUserIdWithSearch($user_id, $limit = 0, $search_term = ''): mixed{
+        $sql = "
+            SELECT 
+                audit_id,
+                title,
+                record_id,
+                result,
+                audit_by,
+                audited_at
+            FROM audits
+            WHERE audit_by = ?
+        ";
+
+        $params = [$user_id];
+        $types = "i";
+
+        // ✅ Add search capability
+        if (!empty($search_term)) {
+            $sql .= "
+                AND (
+                    title LIKE ? 
+                    OR result LIKE ? 
+                    OR record_id LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "sss";
+        }
+
+        // ✅ Add pagination
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // ✅ Prepare, bind, and execute
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        
+        return $stmt->get_result();
+    }
+
     public function getAuditById($id): mixed {
         $sql = "
             SELECT * FROM audits WHERE audit_id = ?;
@@ -37,6 +112,17 @@ class AuditDAO {
         $stmt->execute();
         $result = $stmt->get_result(); // get mysqli_result
         return $result->fetch_assoc(); 
+    }
+
+    public function getAuditByRecordId($id): mixed {
+        $sql = "
+            SELECT * FROM audits WHERE record_id = ? ORDER BY audited_at DESC LIMIT 2;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result(); // get mysqli_result
+        return $result; 
     }
 
     public function addAudit($recordId, $title, $summary, $result, $document_hash, $document_cid, $tx_hash, $userId): mixed {

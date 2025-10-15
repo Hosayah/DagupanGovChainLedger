@@ -9,6 +9,7 @@ include("../../../DAO/UserDao.php");
 include("../../../services/blockchain.php");
 include("../../../services/IpfsUploader.php");
 
+
 $jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; 
 $ipfsUploader = new PinataUploader($jwt);
 $projectDao = new ProjectDao($conn);
@@ -28,8 +29,10 @@ if ($action != 'view') {
     die("Invalid action.");
 }
 
+
 $result = $projectDao->getProjectById($project_id) ?? [];
 $record = $recordDao->getRecordByProjectId($project_id ?? []);
+$auditList = $auditDao->getAuditByRecordId($record["record_id"]);
 $block = getRecordAsArray($contract, $record['record_id']);
 //echo $block['doc_hash'];
 //echo '0x' . $record['document_hash'];
@@ -39,6 +42,28 @@ $userResult = $userDao->getUserByIdFromAgency($result["created_by"]) ?? [];
 $category = $result["category"] ?? '';
 $type = $result['type'] ??'';
 $link = $ipfsUploader->getGatewayUrl($record['document_cid']);
+
+$pdf_data = file_get_contents($link);
+$temp_pdf = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+file_put_contents($temp_pdf, $pdf_data);
+
+// Path to Poppler binary (if not in PATH)
+$poppler_path = "C:\\poppler-25.07.0\\Library\\bin\\pdftotext.exe";
+
+// Output file
+$output_txt = $temp_pdf . ".txt";
+
+// Execute Poppler command
+exec("\"$poppler_path\" \"$temp_pdf\" \"$output_txt\"");
+
+// Read the extracted text
+$text = file_get_contents($output_txt);
+
+$context = $text . '<br>'. 
+print_r( $result, true) . '<br>Blockchain details: ' . 
+print_r( $block, true) .'<br>' .
+print_r($record, true);
+//echo $context;
 
 $auditCounter = $auditDao->getAuditCountersByRecordId($record['record_id']);
   
@@ -69,6 +94,8 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link rel="stylesheet" href="../assets/css/chatbox.css" id="main-style-link" />
+    <link rel="stylesheet" href="../assets/css/landing-page.css" id="main-style-link" />
     <link
       rel="stylesheet"
       type="text/css"
@@ -117,7 +144,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
       <!-- [ Main Content ] start -->
       <div class="grid grid-cols-12 gap-x-6">
         <!-- [ sample-page ] start -->
-         <div class="col-span-12 md:col-span-6">
+         <div class="col-span-12">
           <div class="card">
             <div class="card-header">
               <h5>Project Details</h5>
@@ -138,7 +165,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
             </div>
           </div>
         </div>
-        <div class="col-span-12 md:col-span-6">
+        <div class="col-span-12">
           <div class="card">
             <div class="card-header flex justify-between">
               <h5>Record Metadata</h5>
@@ -221,12 +248,71 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
         <div class="col-span-12 xl:col-span-8 md:col-span-6">
           <div class="card">
             <div class="card-header">
-              <h5>AI Overview</h5>
+              <h5>Recent Audits</h5>
             </div>
             <div class="card-body">
-              <p class="text-md text-gray-700 mb-3">
-                The Dagupan River Flood Control Improvement Project is a strategic initiative by the Department of Public Works and Highways (DPWH) aimed at strengthening flood protection infrastructure along the Pantal and Calmay Rivers in Dagupan City, Pangasinan. This project was developed in response to the city’s recurring flooding issues that have historically impacted both commercial and residential areas.
-              </p>
+              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+                <div class="mb-3 flex">
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                    <tr class="bg-dark text-white text-center font-weight-bold">
+                      <th class="font-weight-bold">Audit ID</th>
+                      <th class="font-weight-bold">Title</th>
+                      <th class="font-weight-bold">Record ID</th>
+                      <th class="font-weight-bold">Result</th>
+                      <th class="font-weight-bold">Submitted By</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <?php if ($auditList->num_rows > 0): ?>
+                      <?php while ($row = $auditList->fetch_assoc()): ?>
+                        <tr>
+                          <td>
+                            <h6 class="mb-0">AU-ID-<?= htmlspecialchars($row['audit_id']) ?></h6>
+                          </td>
+                          <td>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
+                          </td>
+                          <td>
+                            <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
+                          </td>
+                          <td>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
+                          </td>
+                          <td>
+                            <h6 class="mb-0">USER-ID<?= htmlspecialchars($row['audit_by']) ?></h6>
+                          </td>
+                        </tr>
+                      <?php endwhile; ?>
+                    <?php else: ?>
+                      <tr><td colspan="8" style="text-align:center;">No Audits found.</td></tr>
+                    <?php endif; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </form> <!-- Form ends -->
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>AI Assitant</h5>
+            </div>
+            <div class="card-body">
+              <section class="landing" id="landingSection">
+                  <div class="landing-content">
+                      <h1>Hola, Visitor</h1>
+                      <p class="subtext">Welcome to DagupanGovLegder ChatBot</p>
+                  </div>
+              </section>
+              <div class="chat-area" id="chatArea" style="display: none;"></div>
+              <div class="flex">
+                  <input type="text" id="userInput" class="form-control w-full" placeholder="Type your message..." />
+                  <button id="sendBtn" class="btn btn-success">Send</button>
+              </div>
             </div>
           </div>
         </div>
@@ -246,7 +332,12 @@ window.addEventListener("load", function() {
   });
 });
 </script>
-
+<script>
+  // Pass extracted text to chatbot.js safely
+  const pdfContext = <?= json_encode($context) ?>;
+</script>
+<script src="../../../services/chatbox.js"></script>
+<script src="../../../services/chatbox.js"></script>
 <script src="../assets/js/plugins/simplebar.min.js"></script>
 <script src="../assets/js/plugins/popper.min.js"></script>
 <script src="../assets/js/icon/custom-icon.js"></script>

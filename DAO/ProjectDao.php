@@ -17,6 +17,36 @@ class ProjectDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result;
     }
+    public function getAllProjectsWithSearch($limit = 0, $search_term = ''): mixed
+    {
+        // Base SQL
+        $sql = "SELECT * FROM projects WHERE 1=1";
+
+        $params = [];
+        $types = "";
+
+        // ✅ Add search filter if a search term is provided
+        if (!empty($search_term)) {
+            $sql .= " AND (title LIKE ? OR category LIKE ? OR description LIKE ?)";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "sss";
+        }
+
+        // ✅ Add pagination
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // Prepare and bind dynamically
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
+        $stmt->execute();
+        return $stmt->get_result();
+    }
 
     public function getProjectByUserId($id, $limit = 0): mixed {
         $sql = "
@@ -28,6 +58,52 @@ class ProjectDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result; 
     }
+    public function getProjectByUserIdWithSearch($user_id, $limit = 0, $search_term = ''): mixed {
+        $sql = "
+            SELECT 
+                project_id,
+                title,
+                category,
+                description,
+                document_path,
+                created_by,
+                created_at
+            FROM projects
+            WHERE created_by = ?
+        ";
+
+        $params = [$user_id];
+        $types = "i";
+
+        // ✅ Optional search term filter
+        if (!empty($search_term)) {
+            $sql .= " 
+                AND (
+                    title LIKE ? 
+                    OR category LIKE ? 
+                    OR description LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "sss";
+        }
+
+        // ✅ Add pagination
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // ✅ Prepare and execute
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        
+        return $stmt->get_result();
+}
+
 
     /**
      * Get latest projects (default 5)

@@ -15,7 +15,8 @@
   $limit = $_SESSION['limit'];
 
   $projectDao = new ProjectDAO($conn);
-  $projectsList = $projectDao->getAllProjects( $limit);
+  $search_term = $_GET['search_term'] ?? '';
+  $projectsList = $projectDao->getAllProjectsWithSearch($limit, $search_term);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -83,14 +84,17 @@
         <div class="col-span-12">
           <div class="card">
             <div class="card-header flex justify-between">
-              <h5 class="mt-4">List of Approved Accounts</h5>
-              <form action="" method="GET">
-                  <input type="search" class="border-2 shadow-2xl w-150 p-2" placeholder="Search by name"/>
-                  <button type="button" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              <h5 class="mt-4">Projects List</h5>
+              <form method="GET" id="filterForm">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title, category, or description"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
               </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
+                <div class="mb-3 flex">
+                </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
                       <p style="text-align:center; color:green; font-weight:bold;">
@@ -104,9 +108,9 @@
                       <th class="font-weight-bold">Project ID</th>
                       <th class="font-weight-bold">Title</th>
                       <th class="font-weight-bold">Category</th>
+                      <th class="font-weight-bold">Description</th>
                       <th class="font-weight-bold">Created By</th>
                       <th class="font-weight-bold">Created at</th>
-                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>

@@ -17,6 +17,109 @@ class RecordDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result; 
     }
+    public function getAllRecordsWithSearch($limit = 0, $search_term = ''): mixed
+    {
+        // Base SQL with JOIN between records and projects
+        $sql = "
+            SELECT 
+                r.record_id,
+                r.project_id,
+                r.record_type,
+                r.amount,
+                r.document_hash,
+                r.document_cid,
+                r.blockchain_tx,
+                r.submitted_by,
+                r.submitted_at,
+                p.title AS project_title,
+                p.category AS project_category
+            FROM records r
+            INNER JOIN projects p ON r.project_id = p.project_id
+            WHERE 1=1
+        ";
+
+        $params = [];
+        $types = "";
+
+        // ✅ Optional search filter
+        if (!empty($search_term)) {
+            $sql .= " 
+                AND (
+                    p.title LIKE ? 
+                    OR p.category LIKE ? 
+                    OR r.record_type LIKE ?
+                    OR r.document_hash LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            $params = [$search_like, $search_like, $search_like, $search_like];
+            $types = "ssss";
+        }
+
+        // ✅ Pagination
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // ✅ Prepare & bind
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
+    public function getProjectByUserIdWithSearch($user_id, $limit = 0, $search_term = ''): mixed {
+        $sql = "
+            SELECT 
+                r.record_id,
+                r.project_id,
+                r.record_type,
+                r.amount,
+                r.document_hash,
+                r.document_cid,
+                r.blockchain_tx,
+                r.submitted_by,
+                r.submitted_at,
+                p.title AS project_title,
+                p.category AS project_category
+            FROM records r
+            INNER JOIN projects p ON r.project_id = p.project_id
+            WHERE r.submitted_by = ?
+        ";
+
+        $params = [$user_id];
+        $types = "i";
+
+        // ✅ Add optional search filter
+        if (!empty($search_term)) {
+            $sql .= " 
+                AND (
+                    p.title LIKE ? 
+                    OR p.category LIKE ? 
+                    OR r.record_type LIKE ?
+                    OR r.document_hash LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "ssss";
+        }
+
+        // ✅ Pagination
+        $sql .= " LIMIT 5 OFFSET ?";
+        $params[] = $limit;
+        $types .= "i";
+
+        // ✅ Prepare and bind
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
 
     public function getProjectByUserId($id, $limit = 0): mixed {
         $sql = "

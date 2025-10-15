@@ -15,6 +15,37 @@ class UserDAO {
         $stmt->execute();
         return $stmt->get_result;
     }
+    public function getAllProjectsWithSearch($limit = 0, $search_term = ''){
+        $sql = "
+            SELECT p.project_id, p.title, p.category, p.description, p.created_by, p.created_at
+            FROM projects p
+            WHERE 1=1
+        ";
+
+        $params = [];
+
+        // ✅ Add search filter if provided
+        if (!empty($search_term)) {
+            $sql .= " AND (p.title LIKE ? OR p.category LIKE ? OR p.description LIKE ?)";
+            $search_like = "%" . $search_term . "%";
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+        }
+
+        $sql .= " ORDER BY p.created_at DESC LIMIT ?, 10"; // adjust per-page limit if needed
+        $params[] = $limit;
+
+        $stmt = $this->conn->prepare($sql);
+
+        // ✅ Bind parameters dynamically
+        $types = str_repeat('s', count($params) - 1) . 'i'; // all strings except last int for LIMIT
+        $stmt->bind_param($types, ...$params);
+
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
 
     public function getUserById($id): mixed {
         $sql = "

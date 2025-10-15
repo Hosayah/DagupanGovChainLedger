@@ -284,12 +284,13 @@ function submitAudit($contract, $from, $recordId, $docHash, $result)
     usleep(200000);
     return $txResult;
 }
-
-function getAudits($contract, $recordId)
+error_reporting(0);
+ini_set('display_errors', 0);
+function getAuditsAsArray($contract, $recordId)
 {
     $result = [];
 
-    $contract->call('getAudits', (int)$recordId, function ($err, $res) use (&$result) {
+    $contract->call('getAudits', $recordId, function ($err, $res) use (&$result) {
         if ($err !== null) {
             $result = ['error' => $err->getMessage()];
             return;
@@ -300,34 +301,54 @@ function getAudits($contract, $recordId)
             return;
         }
 
-        // Each AuditFinding = [recordId, documentHash, result, auditor, timestamp]
-        $decoded = [];
-        foreach ($res as $finding) {
-            if (!is_array($finding)) continue;
+        // Detect flat array (e.g. length % 5 == 0 for 5 struct fields)
+        $flat = !is_array($res[0]);
+        $fieldsPerStruct = 5; // recordId, docHash, result, auditor, timestamp
+        $audits = [];
 
-            $map = [
-                'record_id' => normalizeValue($finding[0]),
-                'document_hash' => normalizeValue($finding[1]),
-                'result' => (int)normalizeValue($finding[2]),
-                'auditor' => normalizeValue($finding[3]),
-                'timestamp' => normalizeValue($finding[4]),
-            ];
+        if ($flat) {
+            $chunks = array_chunk($res, $fieldsPerStruct);
+            foreach ($chunks as $chunk) {
+                $entry = [];
+                $entry['record_id'] = isset($chunk[0]) ? normalizeValue($chunk[0]) : null;
+                $entry['doc_hash']  = isset($chunk[1]) ? normalizeValue($chunk[1]) : null;
+                $entry['result']    = isset($chunk[2]) ? normalizeValue($chunk[2]) : null;
+                $entry['auditor']   = isset($chunk[3]) ? normalizeValue($chunk[3]) : null;
+                $entry['timestamp'] = isset($chunk[4]) ? normalizeValue($chunk[4]) : '0';
 
-            $map['status'] = match($map['result']) {
-                0 => 'PASSED',
-                1 => 'FLAGGED',
-                2 => 'REJECTED',
-                default => 'UNKNOWN'
-            };
+                $ts = intval($entry['timestamp']);
+                $entry['date'] = ($ts > 0) ? date('c', $ts) : null;
 
-            $map['date'] = date('Y-m-d H:i:s', intval($map['timestamp']));
-            $decoded[] = $map;
+                $audits[] = $entry;
+            }
+        } else {
+            // Nested array (standard struct decoding)
+            foreach ($res as $r) {
+                if (!is_array($r)) continue;
+
+                $entry = [];
+                $entry['record_id'] = isset($r[0]) ? normalizeValue($r[0]) : null;
+                $entry['doc_hash']  = isset($r[1]) ? normalizeValue($r[1]) : null;
+                $entry['result']    = isset($r[2]) ? normalizeValue($r[2]) : null;
+                $entry['auditor']   = isset($r[3]) ? normalizeValue($r[3]) : null;
+                $entry['timestamp'] = isset($r[4]) ? normalizeValue($r[4]) : '0';
+
+                $ts = intval($entry['timestamp']);
+                $entry['date'] = ($ts > 0) ? date('c', $ts) : null;
+
+                $audits[] = $entry;
+            }
         }
 
-        $result = $decoded;
+        $result = $audits;
     });
 
     return $result;
 }
+
+//$data = getAuditsAsArray($contract, 1);
+
+//echo print_r($data[0], true);
+
 
 
