@@ -32,7 +32,27 @@ class UserDAO {
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
         $stmt->execute();
-        return;
+    }
+
+    public function getUserByIdFromAgency($id): mixed {
+        $sql = "
+            SELECT * FROM agencies WHERE user_id = ?;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result(); // get mysqli_result
+        return $result->fetch_assoc(); 
+    }
+    public function getUserByIdFromAuditor($id): mixed {
+        $sql = "
+            SELECT * FROM auditors WHERE user_id = ?;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result(); // get mysqli_result
+        return $result->fetch_assoc(); 
     }
     /**
      * Get latest pending users (default 5)
@@ -44,7 +64,6 @@ class UserDAO {
                 u.full_name, 
                 u.email, 
                 u.account_type,
-                u.role, 
                 u.contact_number,
                 u.status,
                 u.created_at,
@@ -69,8 +88,7 @@ class UserDAO {
                 u.user_id, 
                 u.full_name, 
                 u.email, 
-                u.account_type,
-                u.role, 
+                u.account_type, 
                 u.contact_number,
                 u.status,
                 u.created_at,

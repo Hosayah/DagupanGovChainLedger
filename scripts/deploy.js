@@ -27,7 +27,7 @@ async function main() {
   console.log(`Granted AUDITOR_ROLE to ${auditor.address}`);
 
   // Save ABI + address for frontend
-  const abiDir = path.join(__dirname, "../frontend");
+  const abiDir = path.join(__dirname, "../services");
 
   if (!fs.existsSync(abiDir)) {
     fs.mkdirSync(abiDir);

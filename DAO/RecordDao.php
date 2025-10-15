@@ -40,18 +40,18 @@ class RecordDAO {
         $stmt->bind_param("ii", $id, $limit);
         $stmt->execute();
         $result = $stmt->get_result(); // get mysqli_result
-        return $result; 
+        return $result->fetch_assoc(); 
     }
 
-    public function addProjectById($id): void {
+    public function addRecord($id, $record_type, $amount, $document_hash, $blockchain_tx): void {
         $sql = "
-           INSERT INTO records (project_id, record_type, amount, document_path, document_hash)
-           VALUES (?, ?, ?, ?, ?)
+           INSERT INTO records (project_id, record_type, amount, document_hash, blockchain_tx)
+              VALUES (?, ?, ?, ?)
         ";
         $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("ii", $id,);
+        $stmt->bind_param("isi", $id,);
         $stmt->execute();
-        return $stmt->get_result();
+        //return $stmt->get_result();
     }
     /**
      * Get counters: total users, approved, pending, agency, auditor, citizen
@@ -62,7 +62,6 @@ class RecordDAO {
             "orgTotal" => 0,
             "sum" => 0,
             "orgSum" => 0,
-
         ];
 
         // Records projects
@@ -100,5 +99,29 @@ class RecordDAO {
 
         
         return $data;
+    }
+    public function getSumPerCategory(){
+        $sql = "
+            SELECT 
+                p.category,
+                COALESCE(SUM(r.amount), 0) AS total_amount
+            FROM 
+                projects p
+            LEFT JOIN 
+                records r ON r.project_id = p.project_id
+            GROUP BY 
+                p.category
+        ";
+
+        $result = $this->conn->query($sql);
+        $categoryTotals = [];
+
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                // Store each category and total in an associative array
+                $categoryTotals[$row['category']] = (float)$row['total_amount'];
+            }
+        }
+        return $categoryTotals;
     }
 }

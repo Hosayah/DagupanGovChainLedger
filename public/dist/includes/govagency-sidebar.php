@@ -10,12 +10,9 @@
  <nav class="pc-sidebar">
    <div class="navbar-wrapper">
     <br>
-     <div class="m-header flex items-center py-4 px-6 h-header-height">
-       <a href="../admin/dashboard.php" class="b-brand flex items-center gap-3">
-         <img src="../assets/images/logo/logo.png" alt="logo here" class="w-20" /> <!-- logo images here -->
-         <div class="font-bold text-white">
-          <span class="text-white">Dagupan</span>GovChain
-        </div>
+     <div class="m-header flex items-center justify-center py-4 px-6 h-header-height mb-2">
+       <a href="../admin/dashboard.php" class="b-brand flex items-center justify-center">
+         <img src="../assets/images/logo/logo2.jpg" alt="logo here" class="w-30" /> <!-- logo images here -->
        </a>
      </div>
      <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
@@ -39,20 +36,20 @@
 
          <li class="pc-item"> <!-- Menu 01 -->
            <a href="../govagency/view-projects.php" class="pc-link">
-             <span class="pc-micon"><i data-feather="user"></i></span>
+             <span class="pc-micon"><i data-feather="file-text"></i></span>
              <span class="pc-mtext">View Projects</span>
            </a>
          </li>
 
          <li class="pc-item pc-hasmenu"> <!-- Menu 02 -->
            <a href="../govagency/view-records.php" class="pc-link">
-             <span class="pc-micon"> <i data-feather="user-plus"></i></span>
+             <span class="pc-micon"><i class="ph ph-receipt"></i></span>
              <span class="pc-mtext">View Records</span>
            </a>
          </li>
          <li class="pc-item pc-hasmenu"> <!-- Menu 02 -->
            <a href="../govagency/add-project.php" class="pc-link">
-             <span class="pc-micon"> <i data-feather="user-plus"></i></span>
+             <span class="pc-micon"> <i data-feather="plus-square"></i></span>
              <span class="pc-mtext">Add Project & Record</span>
            </a>
          </li>

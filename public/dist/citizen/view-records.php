@@ -32,6 +32,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -75,12 +85,6 @@
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
-                <div class="mb-3 flex">
-                  <form action="" method="GET">
-                    <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                    <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                  </form>
-                </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
                       <p style="text-align:center; color:green; font-weight:bold;">
@@ -105,35 +109,28 @@
                       <?php while ($row = $RecordsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['record_type']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['amount']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['blockchain_tx']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['submitted_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
                               <i class="fas fa-circle text-warning-500 text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                              <?= htmlspecialchars($row['created_at']) ?>
+                              <?= htmlspecialchars($row['submitted_at']) ?>
                             </h6>
-                          </td>
-                          <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              View
-                            </a>
                           </td>
                         </tr>
                       <?php endwhile; ?>

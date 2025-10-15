@@ -10,12 +10,9 @@
  <nav class="pc-sidebar">
    <div class="navbar-wrapper">
     <br>
-     <div class="m-header flex items-center py-4 px-6 h-header-height">
-       <a href="../admin/dashboard.php" class="b-brand flex items-center gap-3">
-         <img src="../assets/images/logo/logo.png" alt="logo here" class="w-20" /> <!-- logo images here -->
-         <div class="font-bold text-white">
-          <span class="text-white">Dagupan</span>GovChain
-        </div>
+     <div class="m-header flex items-center justify-center py-4 px-6 h-header-height mb-2">
+       <a href="../admin/dashboard.php" class="b-brand flex items-center justify-center">
+         <img src="../assets/images/logo/logo2.jpg" alt="logo here" class="w-30" /> <!-- logo images here -->
        </a>
      </div>
      <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">

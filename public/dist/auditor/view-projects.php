@@ -2,19 +2,20 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/ProjectDao.php");
-  include("../govagency/controller/checkAccess.php");
-  //include("../../../utils/session/checkSession.php");
-  //include("../govagency/controller/checkAccess.php");
-  include("../govagency/controller/tablePageController.php");
+  include("../auditor/controller/checkAccess.php");
+  include("../../../utils/session/checkSession.php");
+  include("../auditor/controller/checkAccess.php");
+  include("../auditor/controller/tablePageController.php");
+
   
   if (!isset($_SESSION['limit'])) {
       $_SESSION['limit'] = 0;
   }
 
   $limit = $_SESSION['limit'];
-  //$user_id = $_SESSION["user"]["id"];
+
   $projectDao = new ProjectDAO($conn);
-  $projectsList = $projectDao->getAllProjects($limit);
+  $projectsList = $projectDao->getAllProjects( $limit);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -33,6 +34,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -43,7 +54,7 @@
 </div>
 <!-- [ Pre-loader ] End -->
  <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/govagency-sidebar.php'; ?>
+   <?php include '../includes/auditor-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
  <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>
@@ -71,17 +82,15 @@
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
-              <h5>View Projects</h5>
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">List of Approved Accounts</h5>
+              <form action="" method="GET">
+                  <input type="search" class="border-2 shadow-2xl w-150 p-2" placeholder="Search by name"/>
+                  <button type="button" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
-                <div class="mb-3 flex">
-                  <form action="" method="GET">
-                    <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                    <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                  </form>
-                </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
                       <p style="text-align:center; color:green; font-weight:bold;">
@@ -95,9 +104,9 @@
                       <th class="font-weight-bold">Project ID</th>
                       <th class="font-weight-bold">Title</th>
                       <th class="font-weight-bold">Category</th>
-                      <th class="font-weight-bold">Description</th>
                       <th class="font-weight-bold">Created By</th>
                       <th class="font-weight-bold">Created at</th>
+                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -105,19 +114,16 @@
                       <?php while ($row = $projectsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['category']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['created_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
@@ -126,10 +132,9 @@
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              Edit
+                            <a href="./view-project-details.php?id=<?= $row['project_id'] ?>&action=view" 
+                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
+                              View
                             </a>
                           </td>
                         </tr>

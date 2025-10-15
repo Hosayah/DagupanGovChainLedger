@@ -8,13 +8,13 @@ if (isset($_SESSION['user'])) {
 
     switch ($type) {
         case 'agency':
-            header("Location: ./dist/admin/dashboard.php");
+            header("Location: ./dist/govagency/dashboard.php");
             exit;
         case 'auditor':
-            header("Location: ./dist/admin/dashboard.php");
+            header("Location: ./dist/auditor/dashboard.php");
             exit;
         case 'citizen':
-            header("Location: ./dist/admin/dashboard.php");
+            header("Location: ./dist/citizen/dashboard.php");
             exit;
         case 'admin':
             header("Location: ./dist/admin/dashboard.php");
@@ -44,7 +44,7 @@ if (isset($_SESSION['user'])) {
     <link rel="stylesheet" href="./dist/assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="./dist/assets/fonts/material.css" />
     <link rel="stylesheet" href="./dist/assets/css/style.css" id="main-style-link" />
-    <link rel="stylesheet" href="../frontend/dist/output.css">
+     <link href="./src/output.css" rel="stylesheet">
   </head>
 
   <body class="bg-gray-50 text-gray-800">

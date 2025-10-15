@@ -14,24 +14,43 @@ $contractAddress = $contractData['address'];
 $contract = new Contract($web3->provider, $abi);
 $contract->at($contractAddress);
 
+$adminWallet = "0x59183A5dc4C8F3E70F9599052af541d2f6f6c673";
+
+// Compute role hash
+$govRole = "0x" . Keccak::hash('GOV_AGENCY_ROLE', 256);
+$auditorRole = "0x" . Keccak::hash('AUDITOR_ROLE', 256);
+
 //echo "✅ Contract initialized: {$contractAddress}<br>";
 
 // ---- Functions ----
 function getCounts($contract)
 {
-    $contract->call('getSpendingCount', function ($err, $result) {
-        if ($err) echo "Error: " . $err->getMessage();
-        else echo "Spending Count: " . $result[0] . "<br>";
+    $count = null;
+
+    $contract->call('getSpendingCount', function ($err, $result) use (&$count) {
+        if ($err !== null) {
+            $count = 0; // fallback on error
+        } else {
+            // handle BigInteger
+            $val = $result[0];
+            if (is_object($val) && property_exists($val, 'value')) {
+                $count = hexdec($val->value);
+            } else {
+                $count = intval($val);
+            }
+        }
     });
+
+    return (int) $count;
 }
 
-function submitSpending($contract, $from, $docHash, $recordType, $amount){
+
+function submitSpending($contract, $from, $docHash, $recordType){
     $txResult = null;
     $contract->send(
         'submitSpendingRecord',
         $docHash,
         $recordType,
-        $amount,
         [
             'from' => $from,
             'gas' => '0x4C4B40', // 5,000,000 gas
@@ -49,9 +68,24 @@ function submitSpending($contract, $from, $docHash, $recordType, $amount){
     return $txResult; 
 }
 
-function addGovAgency($contract, $adminWallet = "0x59183A5dc4C8F3E70F9599052af541d2f6f6c673", $agencyWallet){
+function addGovAgency($contract, $adminWallet, $agencyWallet){
     $contract->send(
         'addGovAgency',
+        $agencyWallet,
+        [
+            'from' => $adminWallet,
+            'gas' => '0x4C4B40',
+            'gasPrice' => '0x3b9aca00'
+        ],
+        function ($err, $tx) {
+            if ($err) echo "❌ Error: " . $err->getMessage();
+            else echo "<script type='text/javascript'>alert('✅ Tx sent successfully!<br>Tx Hash: {$tx}');</script>";
+        }
+    );
+}
+function addAuditor($contract, $adminWallet, $agencyWallet){
+    $contract->send(
+        'addAuditor',
         $agencyWallet,
         [
             'from' => $adminWallet,
@@ -67,7 +101,7 @@ function addGovAgency($contract, $adminWallet = "0x59183A5dc4C8F3E70F9599052af54
 
 //addGovAgency($contract, "0x59183A5dc4C8F3E70F9599052af541d2f6f6c673", "0xdac457007A38eA2d992FBfcA1d07fC36d1210bfD");
 // ---- Example calls ----
-getCounts($contract);
+//getCounts($contract);
 
 function getBalance($web3, $address){
     $web3->eth->getBalance($address, function ($err, $balance) {
@@ -79,31 +113,32 @@ function getBalance($web3, $address){
     });
 }
 
-$from  = "0x23E093083F66AfbC1882dAA72BA5Eb0C4DA5e1c8";
 
-
-// Compute role hash
-$govRole = "0x" . Keccak::hash('GOV_AGENCY_ROLE', 256);
-$auditorRole = "0x" . Keccak::hash('AUDITOR_ROLE', 256);
-
-function hasRole($contract, $role, $from){
-    $contract->call('hasRole', $role, $from, function ($err, $result) {
+function hasRole($contract, $role, $from)
+{
+    $resultBool = false;
+    // Important: web3.php allows single params as separate args
+    $contract->call('hasRole', $role, $from, function ($err, $result) use (&$resultBool) {
         if ($err !== null) {
-            echo "❌ Error: " . $err->getMessage();
+            $resultBool = false;
             return;
         }
 
+        // Handle cases: result may be array([0] => bool) or just bool
         if (is_array($result) && isset($result[0])) {
-            echo $result[0] ? "<script type='text/javascript'>alert('✅ Wallet is authorized');</script>": "<script type='text/javascript'>alert('❌ Wallet does NOT have Gov Agency Role');</script>";
+            $resultBool = (bool)$result[0];
         } else {
-            echo $result ? "<script type='text/javascript'>alert('✅ Wallet is authorized');</script>": "<script type='text/javascript'>alert('❌ Wallet does NOT have Gov Agency Role');</script>";
+            $resultBool = (bool)$result;
         }
     });
+
+    return $resultBool;
 }
-//"<script type='text/javascript'>alert('✅ Wallet is authorized');</script>": "<script type='text/javascript'>alert('❌ Wallet does NOT have Gov Agency Role');</script>";
+
+
 //hasRole($contract, $govRole, $from);
 
-//submitSpending($contract, '0x23E093083F66AfbC1882dAA72BA5Eb0C4DA5e1c8', '0x' . hash('sha256', 'Document'), 'Balance', 5000);
+//submitSpending($contract, '0x23E093083F66AfbC1882dAA72BA5Eb0C4DA5e1c8', '0x' . hash('sha256', 'Document'), 'Balance');
 
 
 function normalizeValue($val) {
@@ -175,9 +210,9 @@ function getRecordAsMap($contract, $recordId, callable $cb)
         $map['record_id']    = isset($result[0]) ? normalizeValue($result[0]) : null;
         $map['doc_hash']     = isset($result[1]) ? normalizeValue($result[1]) : null;
         $map['record_type']  = isset($result[2]) ? normalizeValue($result[2]) : null;
-        $map['amount_wei']   = isset($result[3]) ? normalizeValue($result[3]) : '0';
-        $map['submitted_by'] = isset($result[4]) ? normalizeValue($result[4]) : null;
-        $map['timestamp']    = isset($result[5]) ? normalizeValue($result[5]) : '0';
+        //$map['amount_wei']   = isset($result[3]) ? normalizeValue($result[3]) : '0';
+        $map['submitted_by'] = isset($result[4]) ? normalizeValue($result[3]) : null;
+        $map['timestamp']    = isset($result[5]) ? normalizeValue($result[4]) : '0';
 
         // Convert numeric strings to nicer formats
         // timestamp -> ISO date (if > 0)
@@ -185,7 +220,7 @@ function getRecordAsMap($contract, $recordId, callable $cb)
         $map['date'] = ($ts > 0) ? date('c', $ts) : null;
 
         // amount wei -> amount eth (use bcdiv if available)
-        if (is_numeric($map['amount_wei']) && function_exists('bcdiv')) {
+        /*if (is_numeric($map['amount_wei']) && function_exists('bcdiv')) {
             // keep 18 decimals
             $map['amount_eth'] = bcdiv($map['amount_wei'], '1000000000000000000', 18);
         } elseif (is_numeric($map['amount_wei'])) {
@@ -193,8 +228,7 @@ function getRecordAsMap($contract, $recordId, callable $cb)
             $map['amount_eth'] = (float)$map['amount_wei'] / 1e18;
         } else {
             $map['amount_eth'] = null;
-        }
-
+        }*/
         $cb($map);
     });
 }
@@ -209,10 +243,10 @@ function getRecordAsArray($contract, $recordId)
             $map['record_id']    = normalizeValue($res[0]);
             $map['doc_hash']     = normalizeValue($res[1]);
             $map['record_type']  = normalizeValue($res[2]);
-            $map['amount_wei']   = normalizeValue($res[3]);
-            $map['submitted_by'] = normalizeValue($res[4]);
-            $map['timestamp']    = normalizeValue($res[5]);
-            $map['amount_eth']   = bcdiv($map['amount_wei'], '1000000000000000000', 18);
+            //$map['amount_wei']   = normalizeValue($res[3]);
+            $map['submitted_by'] = normalizeValue($res[3]);
+            $map['timestamp']    = normalizeValue($res[4]);
+            //$map['amount_eth']   = bcdiv($map['amount_wei'], '1000000000000000000', 18);
             $map['date']         = date('c', intval($map['timestamp']));
             $result = $map;
         }
@@ -221,11 +255,79 @@ function getRecordAsArray($contract, $recordId)
 }
 
 //$record = getRecordAsArray($contract, 1);
-//print_r($record['doc_hash']);
+//print_r($record);
 
-/*
-getRecordAsMap($contract, $recordId = 1, function($data) {
-    header('Content-Type: application/json');
-    echo json_encode($data);
-});
-*/
+function submitAudit($contract, $from, $recordId, $docHash, $result)
+{
+    $txResult = null;
+
+    // Solidity Enum AuditResult { PASSED=0, FLAGGED=1, REJECTED=2 }
+    $contract->send(
+        'submitAudit',
+        (int)$recordId,
+        $docHash,
+        (int)$result,
+        [
+            'from' => $from,
+            'gas' => '0x4C4B40',
+            'gasPrice' => '0x3b9aca00'
+        ],
+        function ($err, $tx) use (&$txResult) {
+            if ($err !== null) {
+                $txResult = "❌ Error: " . $err->getMessage();
+                return;
+            }
+            $txResult = $tx;
+        }
+    );
+
+    usleep(200000);
+    return $txResult;
+}
+
+function getAudits($contract, $recordId)
+{
+    $result = [];
+
+    $contract->call('getAudits', (int)$recordId, function ($err, $res) use (&$result) {
+        if ($err !== null) {
+            $result = ['error' => $err->getMessage()];
+            return;
+        }
+
+        if (!is_array($res) || count($res) === 0) {
+            $result = [];
+            return;
+        }
+
+        // Each AuditFinding = [recordId, documentHash, result, auditor, timestamp]
+        $decoded = [];
+        foreach ($res as $finding) {
+            if (!is_array($finding)) continue;
+
+            $map = [
+                'record_id' => normalizeValue($finding[0]),
+                'document_hash' => normalizeValue($finding[1]),
+                'result' => (int)normalizeValue($finding[2]),
+                'auditor' => normalizeValue($finding[3]),
+                'timestamp' => normalizeValue($finding[4]),
+            ];
+
+            $map['status'] = match($map['result']) {
+                0 => 'PASSED',
+                1 => 'FLAGGED',
+                2 => 'REJECTED',
+                default => 'UNKNOWN'
+            };
+
+            $map['date'] = date('Y-m-d H:i:s', intval($map['timestamp']));
+            $decoded[] = $map;
+        }
+
+        $result = $decoded;
+    });
+
+    return $result;
+}
+
+

@@ -1,64 +1,88 @@
 <?php
 session_start();
-include("../../../config/config.php"); // DB connection file
+include("../../../config/config.php");
+include("../../../services/blockchain.php");
+include("../../../utils/session/checkSession.php");
+include("../../../DAO/AuditDao.php");
+include("../../../services/IpfsUploader.php");
+
+$jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; // store securely in .env later
+$uploader = new PinataUploader($jwt);
+$auditDao = new AuditDAO($conn);
+
+$wallet = $_SESSION["user"]["wallet_address"];
+$isRole = hasRole($contract, $auditorRole, $wallet);
+if (!$isRole) {
+    addAuditor($contract, $adminWallet, $wallet);
+}
 
 $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user_type = "admin";
-    $name = trim($_POST["name"]);
-    $email = trim($_POST["email"]);
-    $password = trim($_POST["password"]);
-    $confirm = trim($_POST["confirm"]);
-    $contact = trim($_POST["contact"]);
+    $user_id = $_SESSION["user"]["id"];
+    $title = trim($_POST["title"]);
+    $record_id = trim($_POST["record_id"]);
+    $summary = trim($_POST["summary"]);
+    $result = trim($_POST["result"]); // expect 0,1,2 for PASSED, FLAGGED, REJECTED
 
-    // Generate bcrypt hash (compatible with Node.js bcrypt.hashSync)
-    if($password != $confirm) {
-      $msg = "Password don't match";
+    // ✅ Check if this auditor already audited the record
+    $check = $conn->prepare("SELECT * FROM audits WHERE record_id = ? AND audit_by = ?");
+    $check->bind_param("ii", $record_id, $user_id);
+    $check->execute();
+    $checkResult = $check->get_result();
+
+    if ($checkResult->num_rows > 0) {
+        echo "<script>alert('⚠️ You have already audited this record.');</script>";
+        exit;
+    }
+
+    // ✅ Validate document upload
+    if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+        die("⚠️ No file uploaded or upload error occurred.");
+    }
+
+    // 1️⃣ Upload document to IPFS via Pinata
+    try {
+        $cid = $uploader->uploadDocument($_FILES['document']);
+        $documentUrl = $uploader->getGatewayUrl($cid);
+        $documentHash = hash_file('sha256', $documentUrl); // hash for integrity
+    } catch (Exception $e) {
+        die("❌ IPFS upload failed: " . $e->getMessage());
+    }
+
+    // 2️⃣ Submit audit to blockchain
+    $tx_hash = submitAudit($contract, $wallet, $record_id, $documentHash, $result);
+
+    if (!$tx_hash || str_starts_with($tx_hash, "❌")) {
+        die("❌ Blockchain transaction failed: " . htmlspecialchars($tx_hash));
+    }
+
+    
+
+    // 3️⃣ Mirror to database
+    $dbSuccess = $auditDao->addAudit(
+        $record_id,
+        $title,
+        $summary,
+        $result,
+        $documentHash,
+        $cid,       // store IPFS CID
+        $tx_hash,   // blockchain transaction hash
+        $user_id
+    );
+
+    if ($dbSuccess) {
+        echo "<script>alert('✅ Audit successfully recorded and stored on blockchain!');</script>";
     } else {
-      $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-      if (empty($email) || empty($password) || empty($name)) {
-          $msg = "❌ Please fill in all required fields.";
-      } else {
-          // Check if user already exists
-          $check = $conn->prepare("SELECT * FROM users WHERE email = ?");
-          $check->bind_param("s", $email);
-          $check->execute();
-          $checkResult = $check->get_result();
-
-          if ($checkResult->num_rows > 0) {
-              $msg = "⚠️ Email already registered.";
-          } else {
-              // Insert into users
-              $stmt = $conn->prepare("
-                  INSERT INTO users (account_type, email, password_hash, full_name, contact_number, status)
-                  VALUES (?, ?, ?, ?, ?, 'approved')
-              ");
-              $stmt->bind_param("sssss", $user_type, $email, $hashedPassword, $name, $contact);
-
-              if ($stmt->execute()) {
-                  $userId = $conn->insert_id;
-
-                  $adminStmt = $conn->prepare("
-                      INSERT INTO admins (user_id, access_level)
-                      VALUES (?, 'review_admin')
-                  ");
-                  $adminStmt->bind_param("i", $userId);
-                  $adminStmt->execute();
-                  $msg = "✅ Admin Created successfully.";
-                  
-              } else {
-                  $msg = "❌ Error registering user: " . $stmt->error;
-              }
-          }
-      }
+        echo "<script>alert('⚠️ Audit recorded on blockchain but failed to save in database.');</script>";
     }
 }
 ?>
+
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
 <head>
-  <title>Add Admin</title>
+  <title>Add Audit</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -72,6 +96,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -82,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </div>
 <!-- [ Pre-loader ] End -->
 <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/govagency-sidebar.php'; ?>
+  <?php include '../includes/auditor-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
 <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>
@@ -108,34 +142,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <!-- [ Main Content ] start -->
       <div class="grid grid-cols-12 gap-x-6">
         <!-- [ sample-page ] start -->
-        <div class="col-span-12">
+        <div class="col-span-12 md:col-span-6">
           <div class="card">
             <div class="card-header">
               <h5>Add Audit & Record Details</h5>
             </div>
             <div class="card-body">
-              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+              <form class="form-horizontal" method="POST" enctype="multipart/form-data"> <!-- Form elements -->
                 <div class="mb-3">
                   <label for="floatingInput" class="form-label">Audit Title:</label>
-                  <input type="text" class="form-control" name="title" id="floatingInput" placeholder="E.g Flood Control Audit" />
+                  <input type="text" class="form-control" name="title" id="floatingInput" placeholder="E.g Flood Control Audit" required/>
                 </div>
                 <div class="mb-3">
-                  <label for="floatingInput" class="form-label">Project ID:</label>
-                  <input type="number" class="form-control" name="title" id="floatingInput" placeholder="E.g 1" />
+                  <label for="floatingInput" class="form-label">Record ID:</label>
+                  <input type="number" class="form-control" name="record_id" id="floatingInput" placeholder="E.g 1" required/>
                 </div>
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Summary:</label>
-                  <textarea name="description" class="form-control" id="description" required placeholder="Enter Audit details"></textarea>
+                  <textarea name="summary" class="form-control" id="description" required placeholder="Enter Audit details"></textarea>
+                </div>
+                <div class="mb-4">
+                  <label for="floatingInput1" class="form-label">Audit Result:</label>
+                  <div class="flex">
+                    <input type="radio" class="mr-1.5 w-20" name="result" id="floatingInput1" checked="checked" value="0" required/> 
+                    <p>Passed</p>
+                    <input type="radio" class="mr-1.5 w-20" name="result" id="floatingInput1" value="1" required/> 
+                    <p>Flagged</p>
+                    <input type="radio" class="mr-1.5 w-20" name="result" id="floatingInput1" value="2" required/> 
+                    <p>Rejected</p>
+                  </div>
                 </div>
                <hr>
                <br>
                 <div class="mb-4">
-                  <label for="floatingInput1" class="form-label">Document:</label>
-                  <input type="file" class="form-control" name="document" id="floatingInput1" placeholder="Enter the amount in PHP" required/>
+                  <label for="floatingInput1" class="form-label">Audit/Report Document:</label>
+                  <input type="file" class="form-control" name="document" id="floatingInput1" required/>
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
-                  <div class="form-check">
-                    <button type="submit" class="btn btn-primary mx-auto shadow-2xl">Create Admin</button>
+                  <div class="form-control border-0">
+                    <button type="submit" id="submitBtn" disabled class="form-control bg-success-700 text-white mx-auto shadow-2xl">Submit</button>
+                    <p class="text-md text-gray-700">Read the disclamer. Submission will only be available after agreeing with the terms.</p>
                     <?php if (!empty($msg)): ?>
                       <p id="msg" class="text-sm mb-3 <?= strpos($msg, '✅') !== false ? 'text-green-600' : 'text-red-600' ?>">
                         <?= $msg ?>
@@ -148,6 +194,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
           </div>
         </div>
+        <div class="col-span-12 md:col-span-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>⚠️ Audit Submission Disclaimer</h5>
+            </div>
+            <div class="card-body pc-component break-all whitespace-normal">
+              <dl class="grid grid-cols-12 gap-6">
+                <dt class="col-span-12 sm:col-span-2 font-semibold">Before submitting your audit report, please carefully read and acknowledge the following:</dt>
+                <dd class="col-span-12 sm:col-span-10">
+                  <p class="text-md text-gray-700 mb-3">
+                    By submitting this report, I affirm that all information, findings, and supporting documents provided are accurate, verified, and submitted in good faith.
+                  </p>
+                  <hr>
+                </dd>
+                <dt class="col-span-12 sm:col-span-2 font-semibold">Any falsification, misrepresentation, or deliberate omission of facts is a serious offense and may result in:</dt>
+                <dd class="col-span-12 sm:col-span-10">
+                  <ul class="list-disc ltr:pl-4 rtl:pr-4 ">
+                    <li class="text-md text-gray-700 mb-3">⚖️ Administrative sanctions such as suspension or revocation of system access.</li>
+                    <li class="text-md text-gray-700 mb-3">🚔 Legal and administrative penalties under Philippine laws (e.g., R.A. 6713, R.A. 3019, and relevant anti-fraud provisions).</li>
+                  </ul>
+                  <p class="text-md text-gray-700 mb-3">
+                    All submitted reports will be recorded on the blockchain for transparency and accountability.
+                    Once submitted, records cannot be altered or deleted.
+                  </p>
+                </dd>
+              </dl>
+              <hr>
+              <br>
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="confirmDisclaimer" class="w-4 h-4 accent-green-500">
+                <p class="text-md text-blue-500">I have reviewed and confirm the accuracy of this record.</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- [ sample-page ] end -->
       </div>
       <!-- [ Main Content ] end -->
@@ -155,6 +236,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
   <!-- [ Main Content ] end -->
 
+<script>
+  const checkbox = document.getElementById("confirmDisclaimer");
+  const submitBtn = document.getElementById("submitBtn");
+  checkbox.addEventListener("change", () => {
+    submitBtn.disabled = !checkbox.checked;
+  });
+</script>
+ <script>
+window.addEventListener("load", function() {
+  document.querySelectorAll("textarea").forEach(el => {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  });
+});
+</script>
 <!-- Required Js -->
 <script src="../assets/js/plugins/simplebar.min.js"></script>
 <script src="../assets/js/plugins/popper.min.js"></script>

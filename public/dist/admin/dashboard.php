@@ -81,7 +81,7 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="feather icon-arrow-up text-success-500 text-[30px] mr-1.5"></i>
+                    <img src="https://img.icons8.com/ios/24/1A1A1A/parliament.png" alt="parliament"/> &nbsp;
                     <?= htmlspecialchars($counters['agency']) ?>
                   </h3>
                   <p class="mb-0"><?= htmlspecialchars($agency_percentage) ?>%</p>
@@ -101,7 +101,7 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="feather icon-arrow-down text-danger-500 text-[30px] mr-1.5"></i>
+                    <img src="https://img.icons8.com/ios/32/1A1A1A/credit-control.png" alt="credit-control"/> &nbsp;
                     <?= htmlspecialchars($counters['auditor']) ?>
                   </h3>
                   <p class="mb-0"><?= htmlspecialchars($auditor_percentage) ?>%</p>
@@ -121,7 +121,7 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="feather icon-arrow-down text-danger-500 text-[30px] mr-1.5"></i>
+                    <img src="https://img.icons8.com/ios/28/1A1A1A/user--v1.png" alt="user--v1"/> &nbsp;
                     <?= htmlspecialchars($counters['citizen']) ?>
                   </h3>
                   <p class="mb-0"><?= htmlspecialchars($citizen_percentage) ?>%</p>
@@ -189,7 +189,7 @@
                   <table class="table table-hover">
                     <thead>
                     <tr class="bg-dark text-white text-center font-weight-bold">
-                      <th class="font-weight-bold">No</th>
+                      <th class="font-weight-bold">User ID</th>
                       <th class="font-weight-bold">Account Type</th>
                       <th class="font-weight-bold">Office/Agency Details</th>
                       <th class="font-weight-bold">User Details</th>
@@ -202,7 +202,7 @@
                       <?php while ($row = $pendingUsers->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['user_id']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>

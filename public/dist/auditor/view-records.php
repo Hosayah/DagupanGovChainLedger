@@ -2,9 +2,9 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/RecordDao.php");
-  //include("../govagency/controller/checkAccess.php");
-  //include("../../../utils/session/checkSession.php");
-  include("../govagency/controller/tablePageController.php");
+  include("../auditor/controller/checkAccess.php");
+  include("../../../utils/session/checkSession.php");
+  include("./controller/tablePageController.php");
   
   if (!isset($_SESSION['limit'])) {
       $_SESSION['limit'] = 0;
@@ -32,6 +32,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -42,7 +52,7 @@
 </div>
 <!-- [ Pre-loader ] End -->
  <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/govagency-sidebar.php'; ?>
+  <?php include '../includes/auditor-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
  <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>
@@ -98,6 +108,7 @@
                       <th class="font-weight-bold">Doc. Hash</th>
                       <th class="font-weight-bold">Submitted By</th>
                       <th class="font-weight-bold">Submitted at</th>
+                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -105,31 +116,31 @@
                       <?php while ($row = $RecordsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['record_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['record_type']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['amount']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['document_hash']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['submitted_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
                               <i class="fas fa-circle text-warning-500 text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                              <?= htmlspecialchars($row['created_at']) ?>
+                              <?= htmlspecialchars($row['submitted_at']) ?>
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
+                            <a href="./controller/update-status.php?id=<?= $row['project_id'] ?>&action=reject" 
                               class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
                               onclick="return confirm('Are you sure you want to reject this user?')">
                               View

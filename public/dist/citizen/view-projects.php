@@ -2,9 +2,9 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/ProjectDao.php");
-  //include("../govagency/controller/checkAccess.php");
+  include("../citizen/controller/checkAccess.php");
   include("../../../utils/session/checkSession.php");
-  include("../govagency/controller/tablePageController.php");
+  include("../citizen/controller/tablePageController.php");
   
   if (!isset($_SESSION['limit'])) {
       $_SESSION['limit'] = 0;
@@ -32,6 +32,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -76,10 +86,6 @@
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
                 <div class="mb-3 flex">
-                  <form action="" method="GET">
-                    <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                    <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                  </form>
                 </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
@@ -104,19 +110,16 @@
                       <?php while ($row = $projectsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['category']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['created_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
@@ -125,10 +128,9 @@
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              Edit
+                            <a href="./view-project-details.php?id=<?= $row['project_id'] ?>&action=view" 
+                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
+                              View
                             </a>
                           </td>
                         </tr>

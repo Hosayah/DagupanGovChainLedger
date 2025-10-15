@@ -3,26 +3,32 @@
   include("../../../config/config.php");
   include("../../../DAO/ProjectDao.php");
   include("../../../DAO/RecordDao.php");
-  //include("../govagency/controller/checkAccess.php");
-  //include("../../../utils/session/checkSession.php");
-  //include("../govagency/controller/checkAccess.php");
+  include("../../../DAO/AuditDao.php");
+  include("../citizen/controller/checkAccess.php");
+  include("../../../utils/session/checkSession.php");
   
   $user_id = $_SESSION["user"]["id"];
   $projectDao = new ProjectDAO($conn);
   $recordDao = new RecordDAO($conn);
-  $projectsList = $projectDao->getProjectByUserId($user_id, 0);
+  $auditDao = new AuditDAO($conn);
+  $projectsList = $projectDao->getAllProjects(0);
 
   $pcounters = $projectDao->getProjectCounters($user_id);
+  $audits = $auditDao->getAuditCounters($user_id);
   $rcounters = $recordDao->getRecordCounters($user_id);
+  $categorySums = $recordDao->getSumPerCategory();
+
+  $infrastructure = $categorySums['Infrastructure'] ?? 0;
+  $education = $categorySums['Education'] ?? 0;
+  $agriculture = $categorySums['Agriculture'] ?? 0;
   
   $totalProjects = $pcounters['total'] > 0 ? $pcounters['total'] : 1; // avoid division by zero
-  $totalRecords = $rcounters['total'] > 0 ? $rcounters['total'] :1;
   $totalSpendings = $rcounters['sum'] > 0 ? $rcounters['sum'] : 1;
 
 
-  $projects_percentage   = round(($pcounters['orgTotal']   / $totalProjects) * 100, 2);
-  $records_percentage  = round(($rcounters['orgTotal']  / $totalRecords) * 100, 2);
-  $spending_percentage  = round(($rcounters['orgSum']  / $totalSpendings) * 100, 2);
+  $infrastructurePercentage = round(($infrastructure / $totalSpendings) * 100, 2);
+  $educationPercentage = round(($education / $totalSpendings) * 100, 2);
+  $agriculturePercentage = round(($agriculture / $totalSpendings) * 100, 2);
 ?>
   <!doctype html>
   <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -52,6 +58,7 @@
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
+    <link rel="stylesheet" href="../../src/output.css">
   </head>
 
   <body>
@@ -98,33 +105,26 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <?= htmlspecialchars($pcounters['orgTotal']) ?>
+                    <img src="https://img.icons8.com/ios/24/12B886/project.png" alt="project"/>&nbsp;
+                    <?= htmlspecialchars($pcounters['total']) ?>
                   </h3>
-                  <p class="mb-0"><?= htmlspecialchars($projects_percentage) ?>%</p>
+                 
                 </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($projects_percentage) ?>%"></div>
-                </div>
+                
               </div>
             </div>
           </div>
           <div class="col-span-12 xl:col-span-4 md:col-span-6">
             <div class="card">
               <div class="card-header !pb-0 !border-b-0">
-                <h5>Total Records</h5>
+                <h5>Total Audits</h5>
               </div>
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="ph ph-receipt"></i>&nbsp;
-                    <?= htmlspecialchars($rcounters['orgTotal']) ?>
-                  </h3>
-                  <p class="mb-0"><?= htmlspecialchars($records_percentage) ?>%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($records_percentage) ?>%"></div>
+                   <img src="https://img.icons8.com/dotty/32/12B886/fine-print.png" alt="fine-print"/>&nbsp;
+                    <?= htmlspecialchars($audits['total']) ?>
+                  </h3>          
                 </div>
               </div>
             </div>
@@ -136,15 +136,10 @@
               </div>
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    <i class="ph ph-money"></i> &nbsp;
-                    <?= htmlspecialchars($rcounters['orgSum']) ?>
+                  <h3 class="font-light flex items-center mb-0 ">
+                    <font class="text-green-500">₱</font> &nbsp;
+                    <?= htmlspecialchars(number_format($rcounters['sum'], 2, '.', ',')) ?>
                   </h3>
-                  <p class="mb-0"><?= htmlspecialchars($spending_percentage) ?>%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($spending_percentage) ?>%"></div>
                 </div>
               </div>
             </div>
@@ -157,14 +152,14 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="fas fa-circle text-success text-[12px] mr-1.5"></i>
-                    0
+                    <font class="text-green-500">₱</font> &nbsp;
+                    <?= htmlspecialchars(number_format($infrastructure, 2,'.',',')) ?>
                   </h3>
-                  <p class="mb-0"> 0%</p>
+                  <p class="mb-0"> <?= htmlspecialchars($infrastructurePercentage)?>%</p>
                 </div>
                 <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
                   <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: 0%"></div>
+                    style="width: <?= htmlspecialchars($infrastructurePercentage)?>%"></div>
                 </div>
               </div>
             </div>
@@ -177,14 +172,14 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="fas fa-circle text-success text-[12px] mr-1.5"></i>
-                    0
+                    <font class="text-green-500">₱</font> &nbsp;
+                     <?= htmlspecialchars(number_format($education, 2,'.',',')) ?>
                   </h3>
-                  <p class="mb-0"> 0%</p>
+                  <p class="mb-0"> <?= htmlspecialchars($educationPercentage)?>%</p>
                 </div>
                 <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
                   <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: 0%"></div>
+                    style="width: <?= htmlspecialchars($educationPercentage)?>%"></div>
                 </div>
               </div>
             </div>
@@ -196,15 +191,15 @@
               </div>
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
-                    <i class="fas fa-circle text-success text-[12px] mr-1.5"></i>
-                    0
+                  <h3 class="font-light flex items-center mb-0 ">
+                    <font class="text-green-500">₱</font> &nbsp;
+                     <?= htmlspecialchars(number_format($agriculture, 2,'.',',')) ?>
                   </h3>
-                  <p class="mb-0"> 0%</p>
+                  <p class="mb-0"> <?= htmlspecialchars($agriculturePercentage)?>%</p>
                 </div>
                 <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
                   <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: 0%"></div>
+                    style="width: <?= htmlspecialchars($agriculturePercentage)?>%"></div>
                 </div>
               </div>
             </div>
@@ -240,19 +235,16 @@
                       <?php while ($row = $projectsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['category']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['created_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
@@ -261,22 +253,15 @@
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              Reject
-                            </a>
-
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=approve" 
-                              class="badge bg-theme-bg-1 text-white text-[12px]"
-                              onclick="return confirm('Approve this user account?')">
-                              Approve
+                            <a href="./view-project-details.php?id=<?= $row['project_id'] ?>&action=view" 
+                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
+                              View
                             </a>
                           </td>
                         </tr>
                       <?php endwhile; ?>
                     <?php else: ?>
-                      <tr><td colspan="8" style="text-align:center;">No Projects found.</td></tr>
+                      <tr><td colspan="8" style="text-align:center;">No projects found.</td></tr>
                     <?php endif; ?>
                     </tbody>
                   </table>

@@ -1,10 +1,10 @@
 <?php
   session_start();
   include("../../../config/config.php");
-  include("../../../DAO/ProjectDao.php");
-  //include("../govagency/controller/checkAccess.php");
+  include("../../../DAO/AuditDao.php");
+  include("../citizen/controller/checkAccess.php");
   include("../../../utils/session/checkSession.php");
-  include("../govagency/controller/tablePageController.php");
+  include("../citizen/controller/tablePageController.php");
   
   if (!isset($_SESSION['limit'])) {
       $_SESSION['limit'] = 0;
@@ -12,13 +12,13 @@
 
   $limit = $_SESSION['limit'];
   $user_id = $_SESSION["user"]["id"];
-  $projectDao = new ProjectDAO($conn);
-  $projectsList = $projectDao->getProjectByUserId($user_id, $limit);
+  $auditDao = new AuditDAO($conn);
+  $auditList = $auditDao->getAllAudit($limit);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
 <head>
-  <title>View Projects</title>
+  <title>View Audits</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -32,6 +32,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -55,11 +65,11 @@
       <div class="page-header">
         <div class="page-block">
           <div class="page-header-title">
-            <h5 class="mb-0 font-medium">View-Projects</h5>
+            <h5 class="mb-0 font-medium">View-Audits</h5>
           </div>
           <ul class="breadcrumb">
             <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
-            <li class="breadcrumb-item" aria-current="page">View-projects</li>
+            <li class="breadcrumb-item" aria-current="page">View-audits</li>
           </ul>
         </div>
       </div>
@@ -71,15 +81,11 @@
         <div class="col-span-12">
           <div class="card">
             <div class="card-header">
-              <h5>View Projects</h5>
+              <h5>View Audits</h5>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
                 <div class="mb-3 flex">
-                  <form action="" method="GET">
-                    <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                    <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                  </form>
                 </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
@@ -93,38 +99,44 @@
                     <tr class="bg-dark text-white text-center font-weight-bold">
                       <th class="font-weight-bold">Audit ID</th>
                       <th class="font-weight-bold">Title</th>
-                      <th class="font-weight-bold">Project ID</th>
-                      <th class="font-weight-bold">Description</th>
+                      <th class="font-weight-bold">Record ID</th>
+                      <th class="font-weight-bold">Result</th>
                       <th class="font-weight-bold">Submitted By</th>
                       <th class="font-weight-bold">Submitted at</th>
+                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>
-                      <?php if ($projectsList->num_rows > 0): ?>
-                      <?php while ($row = $projectsList->fetch_assoc()): ?>
+                      <?php if ($auditList->num_rows > 0): ?>
+                      <?php while ($row = $auditList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">AU-ID-<?= htmlspecialchars($row['audit_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID<?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
                               <i class="fas fa-circle text-warning-500 text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                              <?= htmlspecialchars($row['created_at']) ?>
+                              <?= htmlspecialchars($row['audited_at']) ?>
                             </h6>
                           </td>
-                          
+                          <td>
+                            <a href="./view-audit-details.php?id=<?= $row['audit_id'] ?>&action=edit" 
+                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
+                              View
+                            </a>
+                          </td>
                         </tr>
                       <?php endwhile; ?>
                     <?php else: ?>

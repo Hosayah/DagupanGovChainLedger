@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +9,10 @@
     <link rel="stylesheet" href="./dist/admin/dashboard.php">
 </head>
 <body>
-    
+    <!-- upload.html -->
+    <form action="upload.php" method="POST" enctype="multipart/form-data">
+        <input type="file" name="document" required />
+        <button type="submit">Upload to IPFS via Pinata</button>
+    </form>
 </body>
 </html>

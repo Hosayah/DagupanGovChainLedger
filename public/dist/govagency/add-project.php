@@ -1,58 +1,87 @@
 <?php
 session_start();
 include("../../../config/config.php");
-include("../../../services/app.php");
-include("../../../utils/session/checkSession.php"); // DB connection file
+include("../../../services/blockchain.php");
+include("../../../utils/session/checkSession.php");
+include("../../../services/IpfsUploader.php"); 
+
+$jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; // store securely in .env later
+$uploader = new PinataUploader($jwt);
 
 $wallet = $_SESSION["user"]["wallet_address"];
-hasRole($contract, $govRole, $wallet);
+$isRole = hasRole($contract, $govRole, $wallet);
+if (!$isRole) {
+  addGovAgency($contract, $adminWallet, $wallet);
+}
+
+$count = getCounts($contract);
+//echo $count;
 $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user_id = $_SESSION["user"]["user_id"];
+    $user_id = $_SESSION["user"]["id"];
     $title = trim($_POST["title"]);
     $category = trim($_POST["category"]);
     $description = trim($_POST["description"]);
     $record_type = trim($_POST["record_type"]);
     $amount = trim($_POST["amount"]);
-    $document = trim($_POST["document"]);
 
+    // Check for existing title
     $check = $conn->prepare("SELECT * FROM projects WHERE title = ?");
     $check->bind_param("s", $title);
     $check->execute();
     $checkResult = $check->get_result();
+
     if ($checkResult->num_rows > 0) {
-        $msg = "<script type='text/javascript'>alert('⚠️ Email already registered.');</script>";
-        echo $msg;
+        $msg = "<script>alert('⚠️ Project title already exists.');</script>";
+        //echo $msg;
     } else {
-        // Insert into users
+        if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+          die("⚠️ No file uploaded or upload error occurred.");
+        }
+        // 1️⃣ Upload document to Pinata
+        try {
+            $cid = $uploader->uploadDocument($_FILES['document']);
+            $documentUrl = $uploader->getGatewayUrl($cid);
+        } catch (Exception $e) {
+            die("❌ IPFS upload failed: " . $e->getMessage());
+        }
+
+        // 2️⃣ Insert project into database
         $stmt = $conn->prepare("
-          INSERT INTO projects (title, category, description, created_by)
-          VALUES (?, ?, ?, ?)
+          INSERT INTO projects (title, category, description, document_path, created_by)
+          VALUES (?, ?, ?, ?, ?)
         ");
-        $stmt->bind_param("sssi", $title, $category, $description, $user_id);
+        $stmt->bind_param("ssssi", $title, $category, $description, $documentUrl, $user_id);
+
         if ($stmt->execute()) {
             $projectId = $conn->insert_id;
-            $txRes = submitSpending($contract, $wallet, '0x' . hash('sha256', $document), $record_type, $amount);
+
+            // 3️⃣ Submit to blockchain
+            $docHash = hash('sha256', $documentUrl);
+            $txRes = submitSpending($contract, $wallet, '0x' . $docHash, $record_type);
             $record = getRecordAsArray($contract, $projectId);
+
+            // 4️⃣ Mirror record in DB
             $recordStmt = $conn->prepare("
-              INSERT INTO records (project_id, record_type, amount, document_hash, blockchain_tx)
-              VALUES (?, ?, ?, ?)
+              INSERT INTO records (project_id, record_type, amount, document_hash, document_cid, blockchain_tx, submitted_by)
+              VALUES (?, ?, ?, ?, ?, ?, ?)
             ");
-            $recordStmt->bind_param("issss", $projectId, $record_type, $amount, $record['doc_hash'], $txRes);
+            $recordStmt->bind_param("isssssi", $projectId, $record_type, $amount, $docHash, $cid, $txRes, $user_id);
             $recordStmt->execute();
-            $msg = "✅ Record Submitted successfully.";
-                  
+
+            $msg = "✅ Record submitted successfully.";
         } else {
-           $msg = "❌ Error processing record: " . $stmt->error;
+            $msg = "❌ Error inserting project: " . $stmt->error;
         }
     }
 }
 ?>
+
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
 <head>
-  <title>Add Admin</title>
+  <title>Add Project</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -66,6 +95,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
+    <link rel="stylesheet" href="../../src/output.css">
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -102,13 +142,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <!-- [ Main Content ] start -->
       <div class="grid grid-cols-12 gap-x-6">
         <!-- [ sample-page ] start -->
-        <div class="col-span-12">
+        <div class="col-span-12 md:col-span-6">
           <div class="card">
             <div class="card-header">
               <h5>Add Project & Record Detail</h5>
             </div>
             <div class="card-body">
-              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+              <form class="" method="POST" enctype="multipart/form-data"> <!-- Form elements -->
                 <div class="mb-3">
                   <label for="floatingInput" class="form-label">Project Title:</label>
                   <input type="text" class="form-control" name="title" id="floatingInput" placeholder="E.g Flood Control Project" />
@@ -116,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Category:</label>
                   <div class="flex">
-                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Infrastructure" required/> 
+                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Infrastructure" checked="checked" required/> 
                     <p>Infrastructure</p>
                     <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Education" required/> 
                     <p>Education</p>
@@ -135,7 +175,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Record Type:</label>
                   <div class="flex">
-                    <input type="radio" class="mr-1.5 w-20" name="record_type" id="floatingInput1" value="budget" required/> 
+                    <input type="radio" class="mr-1.5 w-20" name="record_type" id="floatingInput1" checked="checked" value="budget" required/> 
                     <p>Budget</p>
                     <input type="radio" class="mr-1.5 w-20" name="record_type" id="floatingInput1" value="invoice" required/> 
                     <p>Invoice</p>
@@ -149,11 +189,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Document:</label>
-                  <input type="file" class="form-control" name="document" id="floatingInput1" placeholder="Enter the amount in PHP" required/>
+                  <input type="file" class="form-control" name="document" id="floatingInput1" placeholder="Upload the Project document/Invoice" required/>
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
-                  <div class="form-check">
-                    <button type="submit" class="btn btn-primary mx-auto shadow-2xl">Create Admin</button>
+                  <div class="form-control border-0">
+                    <button type="submit" id="submitBtn" disabled class="form-control text-white bg-success-700 shadow-2xl">Submit</button>
+                    <p class="text-md text-gray-700 mb-3">Read the disclamer. Submission will only be available after agreeing with the terms.</p>
                     <?php if (!empty($msg)): ?>
                       <p id="msg" class="text-sm mb-3 <?= strpos($msg, '✅') !== false ? 'text-green-600' : 'text-red-600' ?>">
                         <?= $msg ?>
@@ -163,7 +204,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
               </form> <!-- Form ends -->
             </div>
-            
+          </div>
+        </div>
+        <div class="col-span-12 md:col-span-6">
+          <div class="card">
+            <div class="card-header">
+              <h5>⚠️ Disclaimer: Record Submission Notice</h5>
+            </div>
+            <div class="card-body pc-component break-all whitespace-normal">
+              <dl class="grid grid-cols-12 gap-6">
+                <dt class="col-span-12 sm:col-span-2 font-semibold">Please Read:</dt>
+                <dd class="col-span-12 sm:col-span-10">
+                  <p class="text-md text-gray-700 mb-3">
+                    By submitting this record, I hereby certify that all information and attached documents are
+                    <strong>true, accurate, and complete</strong> to the best of my knowledge. I acknowledge that this submission
+                    will be <strong>hashed and stored on the blockchain</strong>, making it permanently verifiable and immutable.
+                    Any falsified or misleading information may result in administrative or legal actions in accordance with
+                    government transparency and anti-corruption policies.
+                  </p>
+                  <hr>
+                </dd>
+                <dt class="col-span-12 sm:col-span-2 font-semibold">Possible Consequences:</dt>
+                <dd class="col-span-12 sm:col-span-10">
+                  <ul class="list-disc ltr:pl-4 rtl:pr-4 ">
+                    <li class="text-md text-gray-700 mb-3">❌ Immediate rejection or invalidation of the submitted record.</li>
+                    <li class="text-md text-gray-700 mb-3">⚖️ Administrative sanctions such as suspension or revocation of system access.</li>
+                    <li class="text-md text-gray-700 mb-3">📜 Disciplinary actions under the agency’s code of conduct.</li>
+                    <li class="text-md text-gray-700 mb-3">💰 Financial and legal liabilities for falsified or fraudulent entries.</li>
+                    <li class="text-md text-gray-700 mb-3">🚔 Criminal prosecution under relevant anti-corruption and falsification laws (e.g., Revised Penal Code, RA 3019 – Anti-Graft and Corrupt Practices Act).</li>
+                  </ul>
+                </dd>
+              </dl>
+              <hr>
+              <br>
+              <div class="flex items-center space-x-2">
+                <input type="checkbox" id="confirmDisclaimer" class="w-4 h-4 accent-green-500">
+                <p class="text-md text-blue-500">I have reviewed and confirm the accuracy of this record.</p>
+              </div>
+            </div>
           </div>
         </div>
         <!-- [ sample-page ] end -->
@@ -174,6 +252,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <!-- [ Main Content ] end -->
 
 <!-- Required Js -->
+ <script>
+  const checkbox = document.getElementById("confirmDisclaimer");
+  const submitBtn = document.getElementById("submitBtn");
+  checkbox.addEventListener("change", () => {
+    submitBtn.disabled = !checkbox.checked;
+  });
+</script>
+ <script>
+window.addEventListener("load", function() {
+  document.querySelectorAll("textarea").forEach(el => {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  });
+});
+</script>
 <script src="../assets/js/plugins/simplebar.min.js"></script>
 <script src="../assets/js/plugins/popper.min.js"></script>
 <script src="../assets/js/icon/custom-icon.js"></script>
@@ -181,7 +274,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <script src="../assets/js/component.js"></script>
 <script src="../assets/js/theme.js"></script>
 <script src="../assets/js/script.js"></script>
-
 <?php include '../includes/footer.php'; ?>
 </body>
 </html>

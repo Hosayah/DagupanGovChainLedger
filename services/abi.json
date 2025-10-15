@@ -42,9 +42,9 @@
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "notes",
-        "type": "string"
+        "internalType": "bytes32",
+        "name": "documenHash",
+        "type": "bytes32"
       }
     ],
     "name": "AuditSubmitted",
@@ -210,6 +210,19 @@
         "type": "address"
       }
     ],
+    "name": "addAuditor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
     "name": "addGovAgency",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -236,9 +249,14 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "notes",
-        "type": "string"
+        "internalType": "bytes32",
+        "name": "documentHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum GovSpendingLedger.AuditResult",
+        "name": "result",
+        "type": "uint8"
       },
       {
         "internalType": "address",
@@ -291,9 +309,14 @@
             "type": "uint256"
           },
           {
-            "internalType": "string",
-            "name": "notes",
-            "type": "string"
+            "internalType": "bytes32",
+            "name": "documentHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "enum GovSpendingLedger.AuditResult",
+            "name": "result",
+            "type": "uint8"
           },
           {
             "internalType": "address",
@@ -338,11 +361,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       },
       {
         "internalType": "address",
@@ -507,11 +525,6 @@
         "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
         "name": "submittedBy",
         "type": "address"
@@ -533,9 +546,14 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "notes",
-        "type": "string"
+        "internalType": "bytes32",
+        "name": "documentHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "enum GovSpendingLedger.AuditResult",
+        "name": "result",
+        "type": "uint8"
       }
     ],
     "name": "submitAudit",
@@ -554,11 +572,6 @@
         "internalType": "string",
         "name": "recordType",
         "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
       }
     ],
     "name": "submitSpendingRecord",

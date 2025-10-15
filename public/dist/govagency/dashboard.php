@@ -97,7 +97,8 @@
               </div>
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
-                  <h3 class="font-light flex items-center mb-0">
+                  <h3 class="font-light flex items-center mb-0"> 
+                   <img src="https://img.icons8.com/ios/24/1A1A1A/project.png" alt="project"/>&nbsp;
                     <?= htmlspecialchars($pcounters['orgTotal']) ?>
                   </h3>
                   <p class="mb-0"><?= htmlspecialchars($projects_percentage) ?>%</p>
@@ -137,8 +138,7 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="ph ph-money"></i> &nbsp;
-                    <?= htmlspecialchars($rcounters['orgSum']) ?>
+                     ₱ <?= htmlspecialchars(number_format($rcounters['orgSum'], 2, '.', ',')) ?>
                   </h3>
                   <p class="mb-0"><?= htmlspecialchars($spending_percentage) ?>%</p>
                 </div>
@@ -178,19 +178,16 @@
                       <?php while ($row = $projectsList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">PR-ID-<?= htmlspecialchars($row['project_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['category']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['created_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
@@ -199,16 +196,9 @@
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              Reject
-                            </a>
-
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=approve" 
-                              class="badge bg-theme-bg-1 text-white text-[12px]"
-                              onclick="return confirm('Approve this user account?')">
-                              Approve
+                            <a href="./edit-project.php?id=<?= $row['project_id'] ?>&action=edit" 
+                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
+                              Edit & View
                             </a>
                           </td>
                         </tr>
@@ -251,5 +241,4 @@
     </script>
   </body>
   <!-- [Body] end -->
-
   </html>

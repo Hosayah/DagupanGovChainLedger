@@ -9,8 +9,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = trim($_POST["password"]);
     $hash = password_hash($password, PASSWORD_BCRYPT);
 
-    
-
     if (empty($email) || empty($password)) {
         $msg = "❌ Please fill in all fields.";
     } else {
@@ -94,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link href="../../../services/dist/output.css" rel="stylesheet">
+  <link href="../../src/output.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
   <div class="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 mt-20">

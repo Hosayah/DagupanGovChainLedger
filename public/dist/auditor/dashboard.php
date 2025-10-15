@@ -3,26 +3,29 @@
   include("../../../config/config.php");
   include("../../../DAO/ProjectDao.php");
   include("../../../DAO/RecordDao.php");
-  include("../govagency/controller/checkAccess.php");
-  //include("../../../utils/session/checkSession.php");
-  //include("../govagency/controller/checkAccess.php");
+  include("../../../DAO/AuditDao.php");
+  include("../auditor/controller/checkAccess.php");
+  include("../../../utils/session/checkSession.php");
+  
   
   $user_id = $_SESSION["user"]["id"];
   $projectDao = new ProjectDAO($conn);
-  $recordDao = new RecordDAO($conn);
-  $projectsList = $projectDao->getProjectByUserId($user_id, 0);
+  $auditDao = new AuditDAO($conn);
+
+  $auditList = $auditDao->getAuditByUserId($user_id);
 
   $pcounters = $projectDao->getProjectCounters($user_id);
-  $rcounters = $recordDao->getRecordCounters($user_id);
+  $auditCounter = $auditDao->getAuditCounters($user_id);
   
-  $totalProjects = $pcounters['total'] > 0 ? $pcounters['total'] : 1; // avoid division by zero
-  $totalRecords = $rcounters['total'] > 0 ? $rcounters['total'] :1;
-  $totalSpendings = $rcounters['sum'] > 0 ? $rcounters['sum'] : 1;
-
-
-  $projects_percentage   = round(($pcounters['orgTotal']   / $totalProjects) * 100, 2);
-  $records_percentage  = round(($rcounters['orgTotal']  / $totalRecords) * 100, 2);
-  $spending_percentage  = round(($rcounters['orgSum']  / $totalSpendings) * 100, 2);
+  $totalAudits = $auditCounter['total'] > 0 ? $auditCounter['total'] : 1;
+  $totalPassed = $auditCounter['passed'] > 0 ? $auditCounter['passed'] : 1;
+  $totalFlagged = $auditCounter['flagged'] > 0 ? $auditCounter['flagged'] : 1;
+  $totalRejected = $auditCounter['rejected'] > 0 ? $auditCounter['rejected'] : 1;
+  
+  $auditsPercentage   = round(($auditCounter['auditorTotal']   / $totalAudits) * 100, 2);
+  $passedPercentage   = round(($auditCounter['auditorPassed']   / $totalPassed) * 100, 2);
+  $flaggedPercentage   = round(($auditCounter['auditorFlagged']   / $totalFlagged) * 100, 2);
+  $rejectedPercentage   = round(($auditCounter['auditorRejected']   / $totalRejected) * 100, 2);
 ?>
   <!doctype html>
   <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -64,7 +67,7 @@
     <!-- [ Pre-loader ] End -->
 
     <!-- [ Sidebar Menu ] start -->
-    <?php include '../includes/govagency-sidebar.php'; ?>
+    <?php include '../includes/auditor-sidebar.php'; ?>
     <!-- [ Sidebar Menu ] end -->
     <!-- [ Header Topbar ] start -->
     <?php include '../includes/header.php'; ?>
@@ -98,13 +101,9 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <?= htmlspecialchars($pcounters['orgTotal']) ?>
+                    <img src="https://img.icons8.com/ios/24/12B886/project.png" alt="project"/>&nbsp;
+                    <?= htmlspecialchars($pcounters['total']) ?>
                   </h3>
-                  <p class="mb-0"><?= htmlspecialchars($projects_percentage) ?>%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($projects_percentage) ?>%"></div>
                 </div>
               </div>
             </div>
@@ -112,19 +111,14 @@
           <div class="col-span-12 xl:col-span-4 md:col-span-6">
             <div class="card">
               <div class="card-header !pb-0 !border-b-0">
-                <h5>Total Records</h5>
+                <h5>Total Audits</h5>
               </div>
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="ph ph-receipt"></i>&nbsp;
-                    <?= htmlspecialchars($rcounters['orgTotal']) ?>
+                    <img src="https://img.icons8.com/dotty/32/12B886/fine-print.png" alt="fine-print"/>&nbsp;
+                    <?= htmlspecialchars($totalAudits) ?>
                   </h3>
-                  <p class="mb-0"><?= htmlspecialchars($records_percentage) ?>%</p>
-                </div>
-                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($records_percentage) ?>%"></div>
                 </div>
               </div>
             </div>
@@ -137,14 +131,66 @@
               <div class="card-body">
                 <div class="flex items-center justify-between gap-3 flex-wrap">
                   <h3 class="font-light flex items-center mb-0">
-                    <i class="ph ph-money"></i> &nbsp;
-                    <?= htmlspecialchars($rcounters['orgSum']) ?>
+                    <img src="https://img.icons8.com/dotty/32/12B886/fine-print.png" alt="fine-print"/> &nbsp;
+                    <?= htmlspecialchars($auditCounter['auditorTotal']) ?>
                   </h3>
-                  <p class="mb-0"><?= htmlspecialchars($spending_percentage) ?>%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-12 xl:col-span-4 md:col-span-6">
+            <div class="card">
+              <div class="card-header !pb-0 !border-b-0">
+                <h5>Passed Audits</h5>
+              </div>
+              <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <h3 class="font-light flex items-center mb-0">
+                    <?= htmlspecialchars($auditCounter['auditorPassed']) ?>
+                  </h3>
+                  <p class="mb-0"><?= htmlspecialchars($passedPercentage) ?>%</p>
                 </div>
                 <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
-                  <div class="bg-theme-bg-2 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
-                    style="width: <?= htmlspecialchars($spending_percentage) ?>%"></div>
+                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
+                    style="width: <?= htmlspecialchars($passedPercentage) ?>%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-12 xl:col-span-4 md:col-span-6">
+            <div class="card">
+              <div class="card-header !pb-0 !border-b-0">
+                <h5>Flagged Audits</h5>
+              </div>
+              <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <h3 class="font-light flex items-center mb-0">
+                    <?= htmlspecialchars($auditCounter['auditorFlagged']) ?>
+                  </h3>
+                  <p class="mb-0"><?= htmlspecialchars($flaggedPercentage) ?>%</p>
+                </div>
+                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
+                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
+                    style="width: <?= htmlspecialchars($flaggedPercentage) ?>%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-span-12 xl:col-span-4 md:col-span-6">
+            <div class="card">
+              <div class="card-header !pb-0 !border-b-0">
+                <h5>Rejected Audits</h5>
+              </div>
+              <div class="card-body">
+                <div class="flex items-center justify-between gap-3 flex-wrap">
+                  <h3 class="font-light flex items-center mb-0">
+                    <?= htmlspecialchars($auditCounter['auditorRejected']) ?>
+                  </h3>
+                  <p class="mb-0"><?= htmlspecialchars($rejectedPercentage) ?>%</p>
+                </div>
+                <div class="w-full bg-theme-bodybg rounded-lg h-1.5 mt-6 dark:bg-themedark-bodybg">
+                  <div class="bg-theme-bg-1 h-full rounded-lg shadow-[0_10px_20px_0_rgba(0,0,0,0.3)]" role="progressbar"
+                    style="width: <?= htmlspecialchars($rejectedPercentage) ?>%"></div>
                 </div>
               </div>
             </div>
@@ -168,49 +214,43 @@
                       <tr class="bg-dark text-white text-center font-weight-bold">
                       <th class="font-weight-bold">Audit ID</th>
                       <th class="font-weight-bold">Title</th>
-                      <th class="font-weight-bold">Project ID</th>
-                      <th class="font-weight-bold">Description</th>
+                      <th class="font-weight-bold">Record ID</th>
+                      <th class="font-weight-bold">Result</th>
                       <th class="font-weight-bold">Submitted By</th>
                       <th class="font-weight-bold">Submitted at</th>
+                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </tr>
                   </thead>
                     <tbody>
-                      <?php if ($projectsList->num_rows > 0): ?>
-                      <?php while ($row = $projectsList->fetch_assoc()): ?>
+                      <?php if ($auditList->num_rows > 0): ?>
+                      <?php while ($row = $auditList->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">AU-ID-<?= htmlspecialchars($row['audit_id']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['title']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0">R-ID-<?= htmlspecialchars($row['record_id']) ?></h6>
+                          </td>
+                           <td>
+                            <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
-                          </td>
-                          <td>
-                            <h6 class="mb-0"></h6>
+                            <h6 class="mb-0"><?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
                               <i class="fas fa-circle text-warning-500 text-[10px] ltr:mr-4 rtl:ml-4"></i>
-                              <?= htmlspecialchars($row['created_at']) ?>
+                              <?= htmlspecialchars($row['audited_at']) ?>
                             </h6>
                           </td>
                           <td>
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=reject" 
-                              class="badge bg-theme-bg-2 text-white text-[12px] mx-2"
-                              onclick="return confirm('Are you sure you want to reject this user?')">
-                              Reject
-                            </a>
-
-                            <a href="./controller/update-status.php?id=<?= $row['user_id'] ?>&action=approve" 
-                              class="badge bg-theme-bg-1 text-white text-[12px]"
-                              onclick="return confirm('Approve this user account?')">
-                              Approve
+                            <a href="./edit-audit.php?id=<?= $row['audit_id'] ?>&action=edit" 
+                              class="badge bg-theme-bg-1 text-white text-[12px]">
+                              Edit & View
                             </a>
                           </td>
                         </tr>

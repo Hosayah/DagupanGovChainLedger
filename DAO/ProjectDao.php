@@ -42,9 +42,25 @@ class ProjectDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result->fetch_assoc(); 
     }
+    public function getProjectById($id): mixed {
+        $sql = "SELECT * FROM projects WHERE project_id = ?;";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result(); // get mysqli_result
+        return $result->fetch_assoc(); // store the result as an associative array 
+    }
     /**
      * Get counters: total users, approved, pending, agency, auditor, citizen
      */
+    public function updateProject($title, $category, $description, $project_id): mixed {
+        $sql = "
+          UPDATE projects SET title= ?, category = ?, description = ? WHERE project_id = ?;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sssi", $title, $category, $description, $project_id);
+        return $stmt->execute();
+    }
     public function getProjectCounters($id) {
         $data = [
             "total" => 0,

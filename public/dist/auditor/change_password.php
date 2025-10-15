@@ -2,9 +2,9 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/UserDao.php");
-  include("../govagency/controller/checkAccess.php");
+  include("../auditor/controller/checkAccess.php");
   include("../../../utils/session/checkSession.php");
-  include("../govagency/controller/checkAccess.php");
+  include("../auditor/controller/checkAccess.php");
 
 ?>
 <!doctype html>
@@ -24,6 +24,16 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -34,7 +44,7 @@
 </div>
 <!-- [ Pre-loader ] End -->
 <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/govagency-sidebar.php'; ?>
+  <?php include '../includes/auditor-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
 <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>

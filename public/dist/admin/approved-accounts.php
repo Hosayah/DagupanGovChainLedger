@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="../assets/fonts/feather.css" />
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
+    <link rel="stylesheet" href="../../src/output.css">
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
 </head>
 <body>
@@ -70,15 +71,15 @@
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
-              <h5>Approved Accounts</h5>
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">List of Approved Accounts</h5>
+              <form action="" method="GET">
+                  <input type="search" class="border-2 shadow-2xl w-150 p-2" placeholder="Search by name"/>
+                  <button type="button" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
             </div>
             <div class="card-body">
               <form class="form-horizontal" method="POST"> <!-- Form elements -->
-                <div class="mb-3 flex">
-                  <input type="search" class="form-control !shadow-none" id="floatingInput" placeholder="Search by name"/>
-                  <button type="button" class="btn btn-transparent mx-auto shadow-2xl"><a href="#"><i data-feather="search"></i></a></button>
-                </div>
                 <div class="table-responsive">
                     <?php if (isset($_SESSION['flash'])): ?>
                       <p style="text-align:center; color:green; font-weight:bold;">
@@ -89,7 +90,7 @@
                   <table class="table table-hover">
                     <thead>
                     <tr class="bg-dark text-white text-center font-weight-bold">
-                      <th class="font-weight-bold">No</th>
+                      <th class="font-weight-bold">User ID</th>
                       <th class="font-weight-bold">Account Type</th>
                       <th class="font-weight-bold">Name</th>
                       <th class="font-weight-bold">Email</th>
@@ -102,7 +103,7 @@
                       <?php while ($row = $approvedUsers->fetch_assoc()): ?>
                         <tr>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['user_id']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['user_id']) ?></h6>
                           </td>
                           <td>
                             <h6 class="mb-1"><?= htmlspecialchars($row['account_type']) ?></h6>
