@@ -1,6 +1,9 @@
 <?php
 session_start();
-
+include("../config/config.php");
+include("../DAO/RecordDao.php");
+include("../DAO/ProjectDao.php");
+include("../DAO/AuditDao.php");
 // If user is already logged in, redirect based on account type
 if (isset($_SESSION['user'])) {
     $user = $_SESSION['user'];
@@ -25,6 +28,12 @@ if (isset($_SESSION['user'])) {
             exit;
     }
 }
+$recordDao = new RecordDAO($conn);
+//$projectDao - new ProjectDAO($conn);
+$auditDao = new AuditDAO($conn);
+$records = $recordDao->getRecordCounters(1);
+//$projects = $projectDao->getProjectCounters(1);
+$audits = $auditDao->getAuditCounters(1);
 ?>
 
 <!doctype html>
@@ -53,13 +62,13 @@ if (isset($_SESSION['user'])) {
   <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
       <div class="text-2xl font-bold text-green-700">
-        <span class="text-gray-800">Dagupan</span>GovChain
+        <span class="text-gray-800">DagupanGovChain</span>
       </div>
     </div>
   </nav>
 
   <!-- ✅ Hero Section -->
-  <section class="mt-24 text-center px-6 py-20 bg-gradient-to-b from-green-50 to-white">
+  <section class="mt-2 text-center px-6 py-20 bg-gradient-to-b from-green-50 to-white">
     <h1 class="text-4xl md:text-5xl font-bold text-green-700 mb-4">Empowering Transparency in Public Spending</h1>
     <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
       View, audit, and understand how government funds are used. Together, let’s promote accountability and transparency in Dagupan City.
@@ -75,16 +84,16 @@ if (isset($_SESSION['user'])) {
     <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Transparency Dashboard Preview</h2>
     <div class="grid md:grid-cols-3 gap-8 text-center">
       <div class="bg-white shadow-md p-6 rounded-xl">
-        <h3 class="text-xl font-semibold mb-2">₱2.3B</h3>
+        <h3 class="text-2xl font-semibold mb-2">₱ <?= htmlspecialchars(number_format($records['sum'], 2, '.', ','))?></h3>
         <p class="text-gray-500">Total Reported Budget</p>
       </div>
       <div class="bg-white shadow-md p-6 rounded-xl">
-        <h3 class="text-xl font-semibold mb-2">142</h3>
+        <h3 class="text-2xl font-semibold mb-2"><?= htmlspecialchars($records['total'])?></h3>
         <p class="text-gray-500">Active Government Projects</p>
       </div>
       <div class="bg-white shadow-md p-6 rounded-xl">
-        <h3 class="text-xl font-semibold mb-2">58</h3>
-        <p class="text-gray-500">Audited Agencies</p>
+        <h3 class="text-2xl font-semibold mb-2"><?= htmlspecialchars($audits['total'])?></h3>
+        <p class="text-gray-500">Total Submitted Audits</p>
       </div>
     </div>
   </section>

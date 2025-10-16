@@ -6,10 +6,10 @@ $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user_type = $_POST["user_type"] ?? "";
-    $name = trim($_POST["name"]);
+    $name = trim($_POST["name"]) ?? null;
     $email = trim($_POST["email"]);
-    $password = trim($_POST["password"]);
-    $confirm = trim($_POST["confirm"]);
+    $password = $_POST["password"];
+    $confirm = $_POST["confirm"];
     $contact = trim($_POST["contact"]);
 
     // Extra info
@@ -22,10 +22,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($confirm != $password) {
       $msg = "❌ Password must match";
+      //header("Location: ./register.php");
     } else {
       // Generate bcrypt hash (compatible with Node.js bcrypt.hashSync)
       $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-      if (empty($email) || empty($password) || empty($name)) {
+      if (empty($email) || empty($password) || empty($fullName)) {
         $msg = "❌ Please fill in all required fields.";
     } else {
         // Check if user already exists
@@ -42,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 INSERT INTO users (account_type, email, password_hash, full_name, contact_number, status)
                 VALUES (?, ?, ?, ?, ?, 'pending')
             ");
-            $stmt->bind_param("sssss", $user_type, $email, $hashedPassword, $name, $contact);
+            $stmt->bind_param("sssss", $user_type, $email, $hashedPassword, $fullName, $contact);
 
             if ($stmt->execute()) {
                 $userId = $conn->insert_id;
@@ -147,7 +148,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <!-- Citizen Form -->
       <form id="citizen-form" class="tab-content hidden" method="POST">
         <input type="hidden" name="user_type" value="citizen">
-        <input type="text" name="name" placeholder="Full Name" class="w-full p-2 border rounded mb-2" required>
+        <input type="hidden" name="name" value="">
+        <input type="text" name="fullName" placeholder="Full Name" class="w-full p-2 border rounded mb-2" required>
         <input type="email" name="email" placeholder="Email Address" class="w-full p-2 border rounded mb-2" required>
         <input type="text" name="contact" placeholder="Contact Number" class="w-full p-2 border rounded mb-2" required>
         <input type="password" name="password" placeholder="Password" class="w-full p-2 border rounded mb-2" required>

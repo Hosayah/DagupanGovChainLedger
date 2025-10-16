@@ -43,9 +43,6 @@ app.post('/chat-with-context', async (req, res) => {
 
     // Build the full prompt for Gemini
     const prompt = `
-You are an AI assistant that must only answer using the following document context.
-If the answer cannot be found, respond with:
-"I’m sorry, I don’t have enough information in the provided document to answer that."
 
 Document Content:
 ${context}

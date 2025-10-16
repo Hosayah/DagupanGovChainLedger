@@ -69,7 +69,7 @@
           </div>
           <ul class="breadcrumb">
             <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
-            <li class="breadcrumb-item" aria-current="page">Adutior Profile</li>
+            <li class="breadcrumb-item" aria-current="page">Citizen Profile</li>
           </ul>
         </div>
       </div>
@@ -77,8 +77,10 @@
 
       <!-- [ Main Content ] start -->
       <div class="grid grid-cols-12 gap-x-6">
+       
         <!-- [ sample-page ] start -->
         <div class="col-span-12">
+           
           <div class="card">
             <div class="card-header">
               <h5>Account Details</h5>
@@ -95,18 +97,10 @@
                       <label for="floatingInput" class="form-label">Username:</label>
                       <input type="text" class="form-control" id="floatingInput" placeholder="Input 1" value="<?= htmlspecialchars($user['name'])?>"/>
                     </div>
-                    <div class="mb-4">
-                      <label for="floatingInput1" class="form-label">Wallet ID:</label>
-                      <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['wallet_address'])?>"/>
-                    </div> 
                 <?php else: ?>
                   <div class="mb-3">
                     <label for="floatingInput" class="form-label">Username:</label>
                     <input type="text" class="form-control" id="floatingInput" placeholder="Input 1" value="<?= htmlspecialchars($user['name'])?>" readonly/>
-                  </div>
-                  <div class="mb-4">
-                    <label for="floatingInput1" class="form-label">Wallet ID:</label>
-                    <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['wallet_address'])?>" readonly/>
                   </div>
                 <?php endif; ?>
                 <div class="flex mt-1 justify-between items-center flex-wrap">

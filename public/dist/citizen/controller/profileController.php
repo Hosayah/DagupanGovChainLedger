@@ -4,7 +4,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           if ($_POST['action'] === 'edit') {
               $_SESSION['isEdit'] = !$_SESSION['isEdit'];
           } elseif ($_POST['action'] === 'save') {
-              $_SESSION['limit'] -= 5;
+              //$_SESSION['limit'] -= 5;
           } 
       }
   }

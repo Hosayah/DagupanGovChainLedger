@@ -2,9 +2,9 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/UserDao.php");
-  include("../govagency/controller/checkAccess.php");
+  include("../citizen/controller/checkAccess.php");
   include("../../../utils/session/checkSession.php");
-  include("../govagency/controller/checkAccess.php");
+  include("../citizen/controller/checkAccess.php");
 
 ?>
 <!doctype html>

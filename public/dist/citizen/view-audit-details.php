@@ -30,6 +30,8 @@ if ($action != 'edit') {
 $userName = $_SESSION["user"]["name"];
 $result = $auditDao->getAuditById($audit_id) ?? [];
 $auditor = $userDao->getUserByIdFromAuditor($result["audit_by"]);
+$user = $userDao->getUserById($auditor["user_id"]);
+$auditName = $user["full_name"];
 $block = getAuditsAsArray($contract, $result['record_id']);
 //$record = $recordDao->getRecordByProjectId($result['record_id']) ?? [];
 $type = $result['type'] ??'';
@@ -53,7 +55,8 @@ $text = file_get_contents($output_txt);
 $context = $text . '<br>'. 
 print_r( $result, true) . '<br> ' . 
 print_r( $auditor, true) .'<br>Blockchain details:' .
-print_r( $block[$audit_id-1], true) .'<br>';
+print_r( $block[$audit_id-1], true) .'<br>Auditor Details' .
+print_r($user, true);
 //echo $context;
 ?>
 
@@ -137,6 +140,8 @@ print_r( $block[$audit_id-1], true) .'<br>';
                 <dd class="col-span-12 sm:col-span-9 break-after-auto whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['summary'])?></textarea></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Office Name:</dt>
                 <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($auditor['organization_name'])?></dd>
+                <dt class="col-span-12 sm:col-span-3 font-semibold">Auditor Name:</dt>
+                <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($auditName)?></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Office Code:</dt>
                 <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($auditor['office_code'])?></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Accredition No.:</dt>

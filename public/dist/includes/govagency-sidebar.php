@@ -11,14 +11,14 @@
    <div class="navbar-wrapper">
     <br>
      <div class="m-header flex items-center justify-center py-4 px-6 h-header-height mb-2">
-       <a href="../admin/dashboard.php" class="b-brand flex items-center justify-center">
+       <a href="../govagency/dashboard.php" class="b-brand flex items-center justify-center">
          <img src="../assets/images/logo/logo2.jpg" alt="logo here" class="w-30" /> <!-- logo images here -->
        </a>
      </div>
      <div class="navbar-content h-[calc(100vh_-_74px)] py-2.5">
        <div class="shrink-0 flex items-center justify-left mb-5">&nbsp;&nbsp;&nbsp;&nbsp;
-         <h5 class="text-left text-white font-medium text-[15px] flex items-center gap-2">
-           <img src="../assets/images/user/avatar-2.jpg" alt="user-image" class="w-10 rounded-full" /><?= htmlspecialchars($name) ?>
+         <h5 class="text-left font-medium text-[15px] flex items-center gap-2">
+           Hello, <?= htmlspecialchars($name) ?>
          </h5>
        </div>
        <div class="grow ms-3 text-center mb-4">

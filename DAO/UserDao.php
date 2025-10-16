@@ -49,7 +49,7 @@ class UserDAO {
 
     public function getUserById($id): mixed {
         $sql = "
-            SELECT * FROM users WHERE user_id = ?;
+            SELECT user_id, account_type, email, full_name, contact_number, office_address, status, created_at FROM users WHERE user_id = ?;
         ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -113,6 +113,77 @@ class UserDAO {
         $stmt->execute();
         return $stmt->get_result();
     }
+    public function getUsersByStatusWithSearch(
+        $status,
+        $limit = 0,
+        $offset = 0,
+        $search_term = '',
+        $order_by = 'u.created_at',
+        $order_dir = 'DESC'
+    ): mixed {
+        // ✅ Whitelist allowed columns for order_by to prevent SQL injection
+        $allowed_order_columns = ['u.created_at', 'u.full_name', 'u.email', 'u.status'];
+        if (!in_array($order_by, $allowed_order_columns)) {
+            $order_by = 'u.created_at';
+        }
+
+        // ✅ Ensure order_dir is only ASC or DESC
+        $order_dir = strtoupper($order_dir) === 'ASC' ? 'ASC' : 'DESC';
+
+        // ✅ Base query with LEFT JOINs
+        $sql = "
+            SELECT 
+                u.user_id, 
+                u.full_name, 
+                u.email, 
+                u.account_type,
+                u.contact_number,
+                u.status,
+                u.created_at,
+                COALESCE(a.agency_name, au.organization_name) AS organization,
+                COALESCE(a.office_code, au.office_code) AS officeCode,
+                COALESCE(a.gov_id_number, au.accreditation_number) AS identifier
+            FROM users u
+            LEFT JOIN agencies a ON u.user_id = a.user_id
+            LEFT JOIN auditors au ON u.user_id = au.user_id
+            WHERE u.status = ?
+        ";
+
+        $params = [$status];
+        $types = "s";
+
+        // ✅ Add search filter if provided
+        if (!empty($search_term)) {
+            $sql .= "
+                AND (
+                    u.full_name LIKE ? OR
+                    u.email LIKE ? OR
+                    a.agency_name LIKE ? OR
+                    au.organization_name LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $params[] = $search_like;
+            $types .= "ssss";
+        }
+
+        // ✅ Add ordering and pagination
+        $sql .= " ORDER BY $order_by $order_dir LIMIT 5 OFFSET ?";
+
+        $params[] = $offset;
+        $types .= "i";
+
+        // ✅ Prepare and execute
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
+
     public function getUsersByRole($type, $limit = 0) {
         $sql = "
             SELECT 
@@ -140,6 +211,83 @@ class UserDAO {
         $stmt->execute();
         return $stmt->get_result();
     }
+    public function getUsersByRoleWithSearch(
+        $type,
+        $limit = 5,
+        $offset = 0,
+        $search_term = '',
+        $order_by = 'u.user_id',
+        $order_dir = 'ASC'
+    ): mixed {
+        // ✅ Whitelist allowed columns to avoid SQL injection
+        $allowed_order_columns = [
+            'u.user_id', 'u.full_name', 'u.email', 'u.account_type',
+            'u.status', 'u.created_at'
+        ];
+        if (!in_array($order_by, $allowed_order_columns)) {
+            $order_by = 'u.user_id';
+        }
+
+        // ✅ Ensure order direction is valid
+        $order_dir = strtoupper($order_dir) === 'DESC' ? 'DESC' : 'ASC';
+
+        // ✅ Base query
+        $sql = "
+            SELECT 
+                u.user_id, 
+                u.full_name, 
+                u.email, 
+                u.account_type, 
+                u.contact_number,
+                u.status,
+                u.created_at,
+                COALESCE(ad.access_level) AS accessLevel,
+                COALESCE(a.agency_name, au.organization_name) AS organization,
+                COALESCE(a.office_code, au.office_code) AS officeCode,
+                COALESCE(a.gov_id_number, au.accreditation_number) AS identifier
+            FROM users u
+            LEFT JOIN agencies a ON u.user_id = a.user_id
+            LEFT JOIN auditors au ON u.user_id = au.user_id
+            LEFT JOIN admins ad ON u.user_id = ad.user_id
+            WHERE u.account_type = ?
+        ";
+
+        $params = [$type];
+        $types = "s";
+
+        // ✅ Add search filter (if any)
+        if (!empty($search_term)) {
+            $sql .= "
+                AND (
+                    u.full_name LIKE ? OR
+                    u.email LIKE ? OR
+                    a.agency_name LIKE ? OR
+                    au.organization_name LIKE ? OR
+                    u.contact_number LIKE ? OR
+                    a.gov_id_number LIKE ? OR
+                    au.accreditation_number LIKE ?
+                )
+            ";
+            $search_like = '%' . $search_term . '%';
+            // add all 7 bindings for the search
+            $params = array_merge($params, array_fill(0, 7, $search_like));
+            $types .= str_repeat("s", 7);
+        }
+
+        // ✅ Add order and pagination
+        $sql .= " ORDER BY $order_by $order_dir LIMIT 5 OFFSET ?";
+
+        $params[] = $offset;
+        $types .= "i";
+
+        // ✅ Prepare and execute query safely
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+
+        return $stmt->get_result();
+    }
+
     /**
      * Get counters: total users, approved, pending, agency, auditor, citizen
      */

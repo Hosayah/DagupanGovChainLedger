@@ -71,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $recordStmt->execute();
 
             $msg = "✅ Record submitted successfully.";
+            echo "<script>alert('✅ Project successfully recorded and stored on blockchain!');</script>";
         } else {
             $msg = "❌ Error inserting project: " . $stmt->error;
         }

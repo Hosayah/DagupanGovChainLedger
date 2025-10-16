@@ -13,7 +13,8 @@
 
   $limit = $_SESSION['limit'];
   $dao = new UserDAO($conn);
-  $approvedUsers = $dao->getUsersByStatus('approved', $limit, $order_by = 'u.user_id', $order_dir = 'ASC');
+  $search_term = $_GET['search_term'] ?? '';
+  $approvedUsers = $dao->getUsersByStatusWithSearch('approved', 5, $limit, $search_term, $order_by = 'u.user_id', $order_dir = 'ASC');
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -72,10 +73,11 @@
         <div class="col-span-12">
           <div class="card">
             <div class="card-header flex justify-between">
-              <h5 class="mt-4">List of Approved Accounts</h5>
-              <form action="" method="GET">
-                  <input type="search" class="border-2 shadow-2xl w-150 p-2" placeholder="Search by name"/>
-                  <button type="button" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              <h5 class="mt-4">Accounts List</h5>
+              <form method="GET" id="filterForm">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by name, email, or contact"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
               </form>
             </div>
             <div class="card-body">

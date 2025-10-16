@@ -29,7 +29,7 @@ if ($action != 'view') {
     die("Invalid action.");
 }
 
-
+$userName = $_SESSION["user"]["name"];
 $result = $projectDao->getProjectById($project_id) ?? [];
 $record = $recordDao->getRecordByProjectId($project_id ?? []);
 $auditList = $auditDao->getAuditByRecordId($record["record_id"]);
@@ -156,7 +156,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Category:</dt>
                 <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($result['category'])?></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Description:</dt>
-                <dd class="col-span-12 sm:col-span-9 min-w-0 break-all whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['description'])?> </textarea></dd>
+                <dd class="col-span-12 sm:col-span-9 min-w-0 break-after-all whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['description'])?> </textarea></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Document Path:</dt>
                 <dd class="col-span-12 sm:col-span-9 min-w-0 break-all whitespace-normal"><textarea class="w-full shadow-none border-0" style="resize: none;" readonly><?= htmlspecialchars($result['document_path'])?> </textarea><a class="text-blue-500" target="_blank" href="<?= htmlspecialchars($link)?>">Click here to view document </a></dd>
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Submitted By:</dt>
@@ -304,7 +304,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
             <div class="card-body">
               <section class="landing" id="landingSection">
                   <div class="landing-content">
-                      <h1>Hola, Visitor</h1>
+                      <h1>Hola, <?= htmlspecialchars($userName)?></h1>
                       <p class="subtext">Welcome to DagupanGovLegder ChatBot</p>
                   </div>
               </section>
