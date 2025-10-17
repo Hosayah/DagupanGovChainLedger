@@ -114,11 +114,47 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       height: 7rem;
       border-radius: 100px;
     }
+    /* Floating background shapes */
+    .floating-shapes {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .floating-shapes span {
+      position: absolute;
+      display: block;
+      border-radius: 9999px;
+      opacity: 0.15;
+      filter: blur(0.5px);
+      will-change: transform;
+    }
+    @keyframes drift1 {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); }
+      50% { transform: translateY(-20px) translateX(10px) rotate(10deg); }
+      100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    }
+    @keyframes drift2 {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); }
+      50% { transform: translateY(25px) translateX(-15px) rotate(-12deg); }
+      100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    }
+    @keyframes drift3 {
+      0% { transform: translateY(0) translateX(0) rotate(0deg); }
+      50% { transform: translateY(-30px) translateX(20px) rotate(8deg); }
+      100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    }
   </style>
 </head>
 
 <body class="ron bg-gray-100 flex justify-center items-center">
-  <div class="">
+  <div class="floating-shapes" aria-hidden="true">
+    <span style="background:#34d399; width:220px; height:220px; left:-60px; top:12%; animation: drift1 14s ease-in-out infinite;"></span>
+    <span style="background:#10b981; width:160px; height:160px; right:-40px; top:34%; animation: drift2 18s ease-in-out infinite;"></span>
+    <span style="background:#22c55e; width:260px; height:260px; left:18%; bottom:-90px; animation: drift3 22s ease-in-out infinite;"></span>
+  </div>
+  <div class="" style="position: relative; z-index: 1;">
     <div class="w-screen max-w-md mx-4 flex">
 
 
