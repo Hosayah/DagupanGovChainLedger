@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
@@ -95,7 +95,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <title>Login</title>
   <link href="../../src/output.css" rel="stylesheet">
   <style>
-    
     .croc-bg {
       background-color: transparent;
 
@@ -103,11 +102,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       display: flex;
 
     }
+
     .ron {
       height: 100dvh;
     }
+
     #croc {
-      border: 5px solid black;
+      border: 3px solid black;
       background-color: white;
       width: 7rem;
       height: 7rem;
@@ -123,19 +124,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       <!-- CARD pulled up so the croc appears attached (no absolute positioning) -->
       <div class=" bg-white shadow-lg rounded-xl">
-          <div class="flex gap-6 items-stretch">
-           <div class=" w-48 sm:w-64 flex-shrink-0 flex flex-col items-center justify-center text-center bg-green-600" style="padding: 12px;">
+        <div class="flex gap-6 items-stretch">
+          <div class=" w-48 sm:w-64 flex-shrink-0 flex flex-col items-center justify-center text-center bg-green-600" style="padding: 12px;">
             <h1 class="text-white text-3xl font-bold mb-3">Login</h1>
             <div class="croc-bg">
               <img src="../assets/images/normal.png" alt="" id="croc">
             </div>
-            
-            
+
+
           </div>
           <!-- Left column: croc + form -->
           <div class="flex-1 min-w-0 p-6">
             <img src="../assets/images/logo/logo2.jpg" alt="Dagupan GovChain Ledger" style="width: auto; height: 96px; border-radius: 10px; object-fit: cover;" />
-            
+
 
             <?php if (!empty($msg)): ?>
               <p id="msg" class="text-sm mb-3 <?= strpos($msg, '✅') !== false ? 'text-green-600' : 'text-red-600' ?>">
@@ -177,7 +178,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
 
           <!-- Right column: welcome + logo -->
-          
+
         </div>
       </div>
     </div>
