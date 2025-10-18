@@ -322,9 +322,31 @@ object {
   display: block; /* 1 */
   vertical-align: middle; /* 2 */
 }
+
+.floating-shapes {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .floating-shapes span {
+      position: absolute;
+      display: block;
+      border-radius: 9999px;
+      opacity: 0.15;
+      filter: blur(0.5px);
+      will-change: transform;
+    }
 /*
 Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
 */
+
+button:hover{
+  cursor:pointer;
+}
+
 img,
 video {
   max-width: 100%;
