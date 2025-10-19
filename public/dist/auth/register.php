@@ -90,11 +90,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <title>Register</title>
   <link href="../../src/output.css" rel="stylesheet">
   <style>
-    body {
-
-      height: 100dvh;
-    }
-
     .floating-shapes {
       position: fixed;
       inset: 0;
@@ -118,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </style>
 </head>
 
-<body class="bg-gray-100 flex justify-center items-center">
+<body class="bg-gray-100 flex justify-center items-center h-screen">
   <div class="floating-shapes" aria-hidden="true">
     <span style="background:#34d399; width:220px; height:220px; left:-60px; top:12%; animation: drift1 14s ease-in-out infinite;"></span>
     <span style="background:#10b981; width:160px; height:160px; right:-40px; top:34%; animation: drift2 18s ease-in-out infinite;"></span>
@@ -148,8 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <div class="p-6">
     
         <!-- Government Agency Form -->
-        <form id="agency-form" class="tab-content" method="POST" novalidate
-          style="width: calc(100% + 40px); margin-left: -20px; margin-right: -20px;">
+        <form id="agency-form" class="tab-content" method="POST" novalidate>
           <input type="hidden" name="user_type" value="agency">
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
