@@ -254,6 +254,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-accreditation">Accreditation / License #</label>
               <input id="auditor-accreditation" type="text" name="accreditation" placeholder="Accreditation number"
                 class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200" required>
+                
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-fullName">Representative Name</label>
+              <input id="auditor-fullName" type="text" name="fullName" placeholder="Representative full name"
+                class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200" required>
             </div>
 
             <div class="sm:col-span-2">
@@ -262,11 +268,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200" required>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-fullName">Representative Name</label>
-              <input id="auditor-fullName" type="text" name="fullName" placeholder="Representative full name"
-                class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200" required>
-            </div>
+           
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-role">Role</label>
@@ -304,6 +306,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
           <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-md hover:bg-green-700 transition">Register</button>
         </form>
+
 
         <!-- Citizen Form -->
         <form id="citizen-form" class="tab-content hidden" method="POST" novalidate
