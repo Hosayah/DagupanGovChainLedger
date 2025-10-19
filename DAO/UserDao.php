@@ -49,7 +49,7 @@ class UserDAO {
 
     public function getUserById($id): mixed {
         $sql = "
-            SELECT user_id, account_type, email, full_name, contact_number, office_address, status, created_at FROM users WHERE user_id = ?;
+            SELECT * FROM users WHERE user_id = ?;
         ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -184,6 +184,22 @@ class UserDAO {
         return $stmt->get_result();
     }
 
+    public function updateUserById($name, $email, $contact, $id): mixed {
+        $sql = "
+            UPDATE users SET full_name = ?, email = ?, contact_number = ? WHERE user_id = ?;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("sssi", $name, $email, $contact, $id);
+        return $stmt->execute();
+    }
+    public function updatePasswordById($password, $id): mixed {
+        $sql = "
+            UPDATE users SET password_hash = ? WHERE user_id = ?;
+        ";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("si", $password, $id);
+        return $stmt->execute();
+    }
     public function getUsersByRole($type, $limit = 0) {
         $sql = "
             SELECT 

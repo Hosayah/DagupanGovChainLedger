@@ -98,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <h5 class="mb-0 font-medium">Add Admin</h5>
           </div>
           <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="./dashboard.php">Home</a></li>
             <li class="breadcrumb-item" aria-current="page">add-admin</li>
           </ul>
         </div>

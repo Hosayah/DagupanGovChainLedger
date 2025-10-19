@@ -6,23 +6,26 @@ $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user_type = $_POST["user_type"] ?? "";
-    $name = trim($_POST["name"]) ?? null;
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-    $confirm = $_POST["confirm"];
-    $contact = trim($_POST["contact"]);
+    $name = trim(preg_replace('/\s+/', ' ', $_POST["name"])) ?? null;
+    $email = trim(preg_replace('/\s+/', ' ', $_POST["email"]));
+    $password = trim(preg_replace('/\s+/', ' ', $_POST["password"]));
+    $confirm = trim(preg_replace('/\s+/', ' ', $_POST["confirm"]));
+    $contact = trim(preg_replace('/\s+/', ' ', $_POST["contact"]));
 
     // Extra info
     $officeCode = $_POST["officeCode"] ?? null;
-    $fullName = $_POST["fullName"] ?? null;
+    $fullName = trim(preg_replace('/\s+/', ' ',$_POST["fullName"])) ?? null;
     $position = $_POST["position"] ?? null;
     $govId = $_POST["govId"] ?? null;
     $accreditation = $_POST["accreditation"] ?? null;
     $wallet = $_POST["wallet"] ?? null;
 
-    if ($confirm != $password) {
+    if (strlen($password) < 6 || preg_match( '/\s+/', $password)) {
+        $msg = "❌ New password must be atleast 6 characters and not have whitespaces";
+    } elseif ($confirm != $password) {
       $msg = "❌ Password must match";
-      //header("Location: ./register.php");
+    } elseif ($contact < 10) {
+      $msg = "❌ Contact must be a valid 10 digit ph number";
     } else {
       // Generate bcrypt hash (compatible with Node.js bcrypt.hashSync)
       $hashedPassword = password_hash($password, PASSWORD_BCRYPT);

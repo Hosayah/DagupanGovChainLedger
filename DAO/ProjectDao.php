@@ -126,6 +126,7 @@ class ProjectDAO {
         $result = $stmt->get_result(); // get mysqli_result
         return $result->fetch_assoc(); // store the result as an associative array 
     }
+    
     /**
      * Get counters: total users, approved, pending, agency, auditor, citizen
      */

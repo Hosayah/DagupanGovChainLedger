@@ -2,8 +2,17 @@
   session_start();
   include("../../../config/config.php");
   include("../../../DAO/UserDao.php");
-  include("../admin/controller/checkAdmin.php");
   include("../../../utils/session/checkSession.php");
+  include("./controller/checkAdmin.php");
+  include("./controller/profileController.php");
+  
+  //$isSaved = $_SESSION['isSaved'] ?? '';
+  $editMode = $_SESSION['isEdit'];
+  //$error = $_SESSION['error'] ?? '';
+  //$changed = $_SESSION['changed'] ??'';
+
+  $dao = new UserDAO($conn);
+  $user = $dao->getUserById($_SESSION['user']['id']);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -22,6 +31,17 @@
     <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
     <link rel="stylesheet" href="../assets/fonts/material.css" />
     <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+    <link rel="stylesheet" href="../../src/output.css">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
 <body>
   <!-- [ Pre-loader ] start -->
@@ -32,7 +52,7 @@
 </div>
 <!-- [ Pre-loader ] End -->
 <!-- [ Sidebar Menu ] start -->
-  <?php include '../includes/admin-sidebar.php'; ?>
+   <?php include '../includes/admin-sidebar.php'; ?>
 <!-- [ Sidebar Menu ] end -->
 <!-- [ Header Topbar ] start -->
   <?php include '../includes/header.php'; ?>
@@ -48,35 +68,94 @@
             <h5 class="mb-0 font-medium">Profile</h5>
           </div>
           <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
-            <li class="breadcrumb-item" aria-current="page">Admin Profile</li>
+            <li class="breadcrumb-item"><a href="./dashboard.php">Home</a></li>
+            <li class="breadcrumb-item" aria-current="page">Profile</li>
           </ul>
         </div>
       </div>
       <!-- [ breadcrumb ] end -->
 
       <!-- [ Main Content ] start -->
-      <div class="grid grid-cols-12 gap-x-6">
+      <div class="card grid grid-cols-12 gap-x-6">
         <!-- [ sample-page ] start -->
-        <div class="col-span-12">
-          <div class="card">
+        <div class="col-span-12 md:col-span-6">
+          <div>
             <div class="card-header">
-              <h5>Title Here (<span style="color: red; font-weight: bold;">*</span> Required)</h5>
+              <h5>Account Details</h5>
             </div>
             <div class="card-body">
-              <form class="form-horizontal"> <!-- Form elements -->
-                <div class="mb-3">
-                  <label for="floatingInput" class="form-label">Input 1<span style="color: red; font-weight: bold;">*</span></label>
-                  <input type="text" class="form-control" id="floatingInput" placeholder="Input 1" />
-                </div>
+              <?php if ($editMode): ?>
+                      <p style="text-align:center; color:green; font-weight:bold;">
+                        Editing...
+                      </p>
+              <?php endif; ?>
+              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+                <?php if ($editMode): ?>
+                     <div class="mb-3">
+                      <label for="floatingInput" class="form-label">Username:</label>
+                      <input type="text" name="name" class="form-control" id="floatingInput" placeholder="Input 1" value="<?= htmlspecialchars($user['full_name'])?>"/>
+                    </div>
+                    <div class="mb-4">
+                      <label for="floatingInput1"  class="form-label">Email:</label>
+                      <input type="text" name="email" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['email'])?>"/>
+                    </div>
+                    <div class="mb-4">
+                      <label for="floatingInput1" class="form-label">Contact:</label>
+                      <input type="text" name="contact" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['contact_number'])?>"/>
+                    </div>
+                <?php else: ?>
+                  <div class="mb-3">
+                    <label for="floatingInput" name="name" class="form-label">Username:</label>
+                    <input type="text" class="form-control" id="floatingInput" placeholder="Input 1" value="<?= htmlspecialchars($user['full_name'])?>" readonly/>
+                  </div>
+                  <div class="mb-4">
+                    <label for="floatingInput1" name="email" class="form-label">Email:</label>
+                    <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['email'])?>" readonly/>
+                  </div>
+                  <div class="mb-4">
+                    <label for="floatingInput1" name="contact" class="form-label">Contact:</label>
+                    <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['contact_number'])?>" readonly/>
+                  </div>
+                  
+                <?php endif; ?>
                 <div class="mb-4">
-                  <label for="floatingInput1" class="form-label">Input 2<span style="color: red; font-weight: bold;">*</span></label>
-                  <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" />
+                  <label for="floatingInput1" class="form-label">Account Type:</label>
+                  <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['account_type'])?>" readonly/>
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
                   <div class="form-check">
-                    <button type="button" class="btn btn-primary mx-auto shadow-2xl"><a href="#">Button 1</a></button>
-                    <button type="button" class="btn btn-warning mx-auto shadow-2xl"><a href="#">Button 2</a></button>
+                    <button type="submit" name="action" value="edit" class="btn mx-auto shadow-2xl"><i data-feather="edit"></i></button>
+                    <button type="submit" name="action" value="save" class="btn text-white bg-success-700 mx-auto shadow-2xl">Save</button>
+                  </div>
+                </div>
+              </form> <!-- Form ends -->
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 md:col-span-6">
+          <div>
+            <div class="card-header">
+              <h5>Change Password</h5>
+            </div>
+            <div class="card-body">
+              
+              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+                <div class="mb-4">
+                  <label for="floatingInput" class="form-label">Old Password</label>
+                  <input type="password" required name="oldPassword" class="form-control" id="floatingInput" placeholder="Enter your old password" />
+                </div>
+                <div class="mb-3">
+                  <label for="floatingInput1" class="form-label">New Password</label>
+                  <input type="password" required name="newPassword" class="form-control" id="floatingInput1" placeholder="Enter your new password" />
+                </div>
+                <div class="mb-3">
+                  <label for="floatingInput1" class="form-label">Confirm Password</label>
+                  <input type="password" required name="confirm" class="form-control" id="floatingInput1" placeholder="Confirm your new password" />
+                </div>
+                <div class="flex mt-1 justify-between items-center flex-wrap">
+                  <div class="form-check">
+                    <button type="submit" name="action" value="change"class = "btn text-white bg-success-700 mx-auto shadow-2xl">Change password</button>
+                    <a href="" class="text-blue-500">forgot password?</a>
                   </div>
                 </div>
               </form> <!-- Form ends -->

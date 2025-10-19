@@ -80,16 +80,6 @@
                     <span>My Profile</span>
                   </span>
                 </a>
-
-                <a href="change_password.php" class="dropdown-item">
-                  <span>
-                    <svg class="pc-icon text-muted me-2 inline-block">
-                      <use xlink:href="#custom-lock-outline"></use>
-                    </svg>
-                    <span>Change Password</span>
-                  </span>
-                </a>
-
                 <a href="#" class="dropdown-item" onclick="return alert('About this System\n\nSystem Name: (Template))\nDeveloper: (Developers)\nContact No. (Contact No.)\nEMail: (email)\n\nCopyright © 2025 Software Solutions.\nAll rights reserved.');">
                   <span>
                     <i class="ti ti-headset"></i>

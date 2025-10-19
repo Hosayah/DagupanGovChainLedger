@@ -63,7 +63,7 @@
               <h5 class="mb-0 font-medium">Dashboard</h5>
             </div>
             <ul class="breadcrumb">
-              <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
+              <li class="breadcrumb-item"><a href="./dashboard.php">Home</a></li>
               <!-- <li class="breadcrumb-item"><a href="javascript: void(0)">Dashboard</a></li> -->
               <li class="breadcrumb-item" aria-current="page">Dashboard</li>
             </ul>
@@ -216,8 +216,6 @@
                           <td>
                             <h6 class="mb-0">Name: </h6>
                             <p class="mb-1"><?= htmlspecialchars($row['full_name']) ?> </p>
-                            <h6 class="mb-0">Role:</h6>
-                            <p class="mb-1"><?= htmlspecialchars($row['role'] ?? '-') ?></p>
                             <h6 class="mb-0">Government ID No.:</h6>
                             <p class="mb-1"><?= htmlspecialchars($row['identifier'] ?? '-') ?></p>
                           </td>
