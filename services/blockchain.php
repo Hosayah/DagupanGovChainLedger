@@ -103,15 +103,15 @@ function addAuditor($contract, $adminWallet, $agencyWallet){
 // ---- Example calls ----
 //getCounts($contract);
 
-function getBalance($web3, $address){
-    $web3->eth->getBalance($address, function ($err, $balance) {
-        if ($err !== null) {
-            echo "❌ Error getting balance: " . $err->getMessage();
-        } else {
-            echo "💰 Wallet balance: " . $balance->toString() . " wei<br>";
-        }
-    });
+function getBalance($web3, $address) {
+    try {
+        $balance = $web3->eth->getBalance($address);
+        return $balance->toString();
+    } catch (Exception $e) {
+        return null;
+    }
 }
+
 
 
 function hasRole($contract, $role, $from)

@@ -188,7 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <span style="background:#22c55e; width:260px; height:260px; left:18%; bottom:-90px; animation: drift3 22s ease-in-out infinite;"></span>
   </div>
   <div class="" style="position: relative; z-index: 1;">
-    <div class="w-screen mx-4 flex">
+    <div class="w-screen mx-4 flex justify-center">
 
 
       <!-- CARD pulled up so the croc appears attached (no absolute positioning) -->
@@ -202,7 +202,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </div>
           <!-- Right column: croc + form -->
           <div class="flex-1 min-w-0 p-6">
-            <a href="../index.php"> <img src="../assets/images/logo/logo2.jpg" alt="Dagupan GovChain Ledger" style="width: auto; height: 96px; border-radius: 10px; object-fit: cover;" />
+            <a href="../../index.php"> <img src="../assets/images/logo/logo2.jpg" alt="Dagupan GovChain Ledger" style="width: auto; height: 96px; border-radius: 10px; object-fit: cover;" />
             </a>
 
             <?php if (!empty($msg)): ?>

@@ -13,6 +13,7 @@
 
   $dao = new UserDAO($conn);
   $user = $dao->getUserById($_SESSION['user']['id']);
+  $agency = $dao->getUserByIdFromAgency($_SESSION['user']['id']);
 ?>
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -121,6 +122,10 @@
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Account Type:</label>
                   <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($user['account_type'])?>" readonly/>
+                </div>
+                <div class="mb-4">
+                  <label for="floatingInput1" class="form-label">Wallet:</label>
+                  <input type="text" class="form-control" id="floatingInput1" placeholder="Input 2" value="<?= htmlspecialchars($agency['wallet_address'])?>" readonly/>
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
                   <div class="form-check">

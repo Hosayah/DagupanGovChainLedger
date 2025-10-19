@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("../../../config/config.php"); // DB connection file
+include("../../../services/blockchain.php");
 
 $msg = "";
 
@@ -13,12 +14,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $contact = trim(preg_replace('/\s+/', ' ', $_POST["contact"]));
 
     // Extra info
-    $officeCode = $_POST["officeCode"] ?? null;
+    $officeCode = trim(preg_replace('/\s+/', ' ', $_POST["officeCode"])) ?? null;
     $fullName = trim(preg_replace('/\s+/', ' ',$_POST["fullName"])) ?? null;
-    $position = $_POST["position"] ?? null;
-    $govId = $_POST["govId"] ?? null;
-    $accreditation = $_POST["accreditation"] ?? null;
-    $wallet = $_POST["wallet"] ?? null;
+    $position = trim(preg_replace('/\s+/', ' ', $_POST["position"])) ?? null;
+    $govId = trim(preg_replace('/\s+/', ' ', $_POST["govId"])) ?? null;
+    $accreditation = trim(preg_replace('/\s+/', ' ', $_POST["accreditation"])) ?? null;
+    $wallet = trim(preg_replace('/\s+/', ' ', $_POST["wallet"])) ?? null;
+
+    // Filter email
+    $email = filter_var($email, FILTER_VALIDATE_EMAIL);
+
+    // Wallet checking
+    $balance = getBalance($web3, $wallet);
+    $hasGovRole = hasRole($contract, $govRole, $wallet);
+    $hasAuditorRole = hasRole($contract, $auditorRole, $wallet);
 
     if (strlen($password) < 6 || preg_match( '/\s+/', $password)) {
         $msg = "❌ New password must be atleast 6 characters and not have whitespaces";
@@ -26,6 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $msg = "❌ Password must match";
     } elseif ($contact < 10) {
       $msg = "❌ Contact must be a valid 10 digit ph number";
+    } elseif ($hasGovRole || $hasAuditorRole) {
+      $msg = "Wallet address already registered.";
+    } elseif (empty($balance) || $balance < 1) {
+      $msg = "Wallet must have at least 1 ETH.";
     } else {
       // Generate bcrypt hash (compatible with Node.js bcrypt.hashSync)
       $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -40,6 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
       if ($checkResult->num_rows > 0) {
         $msg = "⚠️ Email already registered.";
+      } elseif (!$email) {
+        $msg = "❌ Please enter a valid email!";
       } else {
         // Insert into users
         $stmt = $conn->prepare("
@@ -136,8 +151,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <?php endif; ?>
 
       <!-- Tabs -->
-      <div class="flex justify-center border-b mb-6">
-        <button id="agency-tab" class="tab-btn px-4 py-2 font-semibold text-green-600 border-b-2 border-green-600">Government Agency</button>
+      <div class="flex justify-center border-b mb-3">
+        <button id="agency-tab" class="tab-btn px-4 py-2 text-green-600 border-b-2 border-green-600">Government Agency</button>
         <button id="auditor-tab" class="tab-btn px-4 py-2 text-gray-600 hover:text-green-600">Auditor</button>
         <button id="citizen-tab" class="tab-btn px-4 py-2 text-gray-600 hover:text-green-600">Citizen</button>
       </div>
