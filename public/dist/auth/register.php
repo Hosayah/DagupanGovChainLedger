@@ -35,9 +35,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       $msg = "❌ Password must match";
     } elseif ($contact < 10) {
       $msg = "❌ Contact must be a valid 10 digit ph number";
-    } elseif ($hasGovRole || $hasAuditorRole) {
+    } elseif (!empty($wallet) && ($hasGovRole || $hasAuditorRole)) {
       $msg = "Wallet address already registered.";
-    } elseif (empty($balance) || $balance < 1) {
+    } elseif (!empty($wallet) && (empty($balance) || $balance < 1)) {
       $msg = "Wallet must have at least 1 ETH.";
     } else {
       // Generate bcrypt hash (compatible with Node.js bcrypt.hashSync)

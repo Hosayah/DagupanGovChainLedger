@@ -75,7 +75,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
           }
         } else {
-          echo $user['password_hash'];
           $msg = "❌ Invalid password.";
         }
       }
@@ -233,11 +232,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                   <img src="../assets/images/eye.svg" alt="" class="eye" style="width: 20px; height: 20px;">
                 </button>
               </div>
+      
               <button type="submit" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700">
                 Login
               </button>
             </form>
-
+            <p class="mt-4 text-sm text-gray-600 text-center mb-4">
+              <a href="./verifyEmail.php" class="text-green-600 hover:underline">Forgot password?</a>
+            </p>
+            <hr>
             <p class="mt-4 text-sm text-gray-600 text-center">
               Don’t have an account?
               <a href="./register.php" class="text-green-600 hover:underline">Register here</a>

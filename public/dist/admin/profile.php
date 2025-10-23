@@ -155,7 +155,7 @@
                 <div class="flex mt-1 justify-between items-center flex-wrap">
                   <div class="form-check">
                     <button type="submit" name="action" value="change"class = "btn text-white bg-success-700 mx-auto shadow-2xl">Change password</button>
-                    <a href="" class="text-blue-500">forgot password?</a>
+                   <a href="../auth/forgotPassword.php" class="text-blue-500">forgot password?</a>
                   </div>
                 </div>
               </form> <!-- Form ends -->
