@@ -7,7 +7,6 @@ require "../../../vendor/phpmailer/phpmailer/src/Exception.php";
 require '../../../vendor/phpmailer/phpmailer/src/PHPMailer.php';
 require '../../../vendor/phpmailer/phpmailer/src/SMTP.php';
 
-// xsmtpsib-a79335d8c8a5cbd5f752f751c5884b1749addb8746ebde7e0597649d12402ea1-NlOE0w4B3V9PwaEO
 
 function send_otp($toEmail, $otp) {
     $mail = new PHPMailer(true);
