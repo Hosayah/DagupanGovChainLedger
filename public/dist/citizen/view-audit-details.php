@@ -131,6 +131,7 @@ print_r($user, true);
           <div class="card">
             <div class="card-header">
               <h5>Audit Basic Details</h5>
+             
             </div>
             <div class="card-body">
               <dl class="grid grid-cols-12 gap-6">

@@ -5,8 +5,11 @@ include("../../../services/blockchain.php");
 include("../../../utils/session/checkSession.php");
 include("../../../DAO/AuditDao.php");
 include("../../../services/IpfsUploader.php");
+include("../../../utils/constants/api.php");
 
-$jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; // store securely in .env later
+$api = new ApiKey();
+$jwt = $api->getIpfsApi();
+
 $uploader = new PinataUploader($jwt);
 $auditDao = new AuditDAO($conn);
 
@@ -15,13 +18,15 @@ $isRole = hasRole($contract, $auditorRole, $wallet);
 if (!$isRole) {
     addAuditor($contract, $adminWallet, $wallet);
 }
-
+if (!isset($_GET['title']) || !isset($_GET['record_id'])) {
+    die("Invalid access. Please go through the project details page.");
+}
+$title = isset($_GET['title']) ? htmlspecialchars($_GET['title']) : 'Fetch not working';
+$record_id = isset($_GET['record_id']) ? htmlspecialchars($_GET['record_id']) : 'Fetch not working';
 $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $user_id = $_SESSION["user"]["id"];
-    $title = trim($_POST["title"]);
-    $record_id = trim($_POST["record_id"]);
     $summary = trim($_POST["summary"]);
     $result = trim($_POST["result"]); // expect 0,1,2 for PASSED, FLAGGED, REJECTED
 
@@ -132,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <h5 class="mb-0 font-medium">Add Audit</h5>
           </div>
           <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="./dashboard.php">Home</a></li>
             <li class="breadcrumb-item" aria-current="page">add-Audit</li>
           </ul>
         </div>
@@ -150,12 +155,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <div class="card-body">
               <form class="form-horizontal" method="POST" enctype="multipart/form-data"> <!-- Form elements -->
                 <div class="mb-3">
+                  <label for="floatingInput" class="form-label">Project Title:</label>
+                  <input type="text" class="form-control" name="title" id="floatingInput" value="<?= $title ?>" <?= $title ? 'readonly' : '' ?> required/>
+                </div>
+                <div class="mb-3">
                   <label for="floatingInput" class="form-label">Audit Title:</label>
                   <input type="text" class="form-control" name="title" id="floatingInput" placeholder="E.g Flood Control Audit" required/>
                 </div>
                 <div class="mb-3">
                   <label for="floatingInput" class="form-label">Record ID:</label>
-                  <input type="number" class="form-control" name="record_id" id="floatingInput" placeholder="E.g 1" required/>
+                  <input type="number" class="form-control" name="record_id" id="floatingInput" value="<?= $record_id ?>" <?= $record_id ? 'readonly' : '' ?> required/>
+
                 </div>
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Summary:</label>

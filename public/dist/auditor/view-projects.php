@@ -139,7 +139,7 @@
                           <td>
                             <a href="./view-project-details.php?id=<?= $row['project_id'] ?>&action=view" 
                               class="badge bg-theme-bg-2 text-white text-[12px] mx-2">
-                              View
+                              View & Audit
                             </a>
                           </td>
                         </tr>
@@ -152,7 +152,7 @@
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
                   <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="dec"><i data-feather="arrow-left"></i></button>
-                  <?= htmlspecialchars($limit)?>
+                  <?= htmlspecialchars($limit==0 ? 1 : $limit/5 + 1)?>
                   <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="inc"><i data-feather="arrow-right"></i></button>
                 </div>
               </form> <!-- Form ends -->

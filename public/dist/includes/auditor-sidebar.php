@@ -53,12 +53,13 @@
              <span class="pc-mtext">View Audits</span>
            </a>
          </li>
-         <li class="pc-item pc-hasmenu"> <!-- Menu 04 -->
+        <!-- This was removed as requested by sir Jan Juliene-->
+         <!--<li class="pc-item pc-hasmenu"> 
            <a href="../auditor/add-audit.php" class="pc-link">
              <span class="pc-micon"> <i data-feather="plus-square"></i></span>
              <span class="pc-mtext">Submit Audit</span>
            </a>
-         </li>
+         </li> -->
 
        
 

@@ -8,9 +8,10 @@ include("../../../DAO/AuditDao.php");
 include("../../../DAO/UserDao.php");
 include("../../../services/blockchain.php");
 include("../../../services/IpfsUploader.php");
+include("../../../utils/constants/api.php");
 
-
-$jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; 
+$api = new ApiKey();
+$jwt = $api->getIpfsApi();
 $ipfsUploader = new PinataUploader($jwt);
 $projectDao = new ProjectDao($conn);
 $recordDao = new RecordDao($conn);
@@ -29,7 +30,7 @@ if ($action != 'view') {
     die("Invalid action.");
 }
 
-
+$userName = $_SESSION["user"]["name"];
 $result = $projectDao->getProjectById($project_id) ?? [];
 $record = $recordDao->getRecordByProjectId($project_id ?? []);
 $auditList = $auditDao->getAuditByRecordId($record["record_id"]);
@@ -66,12 +67,14 @@ print_r($record, true);
 //echo $context;
 
 $auditCounter = $auditDao->getAuditCountersByRecordId($record['record_id']);
-  
+
+// Counters  
 $totalAudits = $auditCounter['total'] > 0 ? $auditCounter['total'] : 1;
 $totalPassed = $auditCounter['passed'] > 0 ? $auditCounter['passed'] : 1;
 $totalFlagged = $auditCounter['flagged'] > 0 ? $auditCounter['flagged'] : 1;
 $totalRejected = $auditCounter['rejected'] > 0 ? $auditCounter['rejected'] : 1;
-  
+
+// Percentages
 $passedPercentage   = round(($auditCounter['passed']   / $totalAudits) * 100, 2);
 $flaggedPercentage   = round(($auditCounter['flagged']   / $totalAudits) * 100, 2);
 $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100, 2);
@@ -133,7 +136,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
             <h5 class="mb-0 font-medium">View Project Details</h5>
           </div>
           <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../admin/dashboard.php">Home</a></li>
+            <li class="breadcrumb-item"><a href="./dashboard.php">Home</a></li>
             <li class="breadcrumb-item" aria-current="page">View-projects</li>
             <li class="breadcrumb-item" aria-current="page">view-project</li>
           </ul>
@@ -146,8 +149,13 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
         <!-- [ sample-page ] start -->
          <div class="col-span-12">
           <div class="card">
-            <div class="card-header">
+            <div class="card-header flex justify-between">
               <h5>Project Details</h5>
+              <a href="./add-audit.php?title=<?= urlencode($result['title']) ?>&record_id=<?= urlencode($record['record_id']) ?>" 
+                class="btn text-white bg-primary-500">
+                Audit Project
+              </a>
+
             </div>
             <div class="card-body pc-component break-all whitespace-normal">
               <dl class="grid grid-cols-12 gap-6">
@@ -304,7 +312,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
             <div class="card-body">
               <section class="landing" id="landingSection">
                   <div class="landing-content">
-                      <h1>Hola, Visitor</h1>
+                      <h1>Hola, <?= htmlspecialchars($userName)?></h1>
                       <p class="subtext">Welcome to DagupanGovLegder ChatBot</p>
                   </div>
               </section>

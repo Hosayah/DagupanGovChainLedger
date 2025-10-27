@@ -4,8 +4,7 @@
 const express = require('express');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-
+require('dotenv').config();  
 
 const app = express();
 app.use(cors());
@@ -16,7 +15,7 @@ let model;
 
 // Initialize Gemini
 try {
-  genAI = new GoogleGenerativeAI('AIzaSyAxLmxUMRko0hhq9Trd723BwGVpiVdqyEk');
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
   model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 } catch (error) {
   console.error('Failed to initialize Gemini AI:', error);

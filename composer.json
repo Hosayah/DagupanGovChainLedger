@@ -14,6 +14,7 @@
     "require": {
         "sc0vu/web3.php": "^0.1.4",
         "kornrunner/keccak": "^1.1",
-        "phpmailer/phpmailer": "^7.0"
+        "phpmailer/phpmailer": "^7.0",
+        "vlucas/phpdotenv": "^5.6"
     }
 }

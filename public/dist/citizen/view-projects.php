@@ -86,7 +86,7 @@
             <div class="card-header flex justify-between">
               <h5 class="mt-4">Projects List</h5>
               <form method="GET" id="filterForm">
-                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title, category, or description"
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by title or category"
                     value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
                   <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
               </form>
@@ -108,9 +108,9 @@
                       <th class="font-weight-bold">Project ID</th>
                       <th class="font-weight-bold">Title</th>
                       <th class="font-weight-bold">Category</th>
-                      <th class="font-weight-bold">Description</th>
                       <th class="font-weight-bold">Created By</th>
                       <th class="font-weight-bold">Created at</th>
+                       <th class="font-weight-bold">Action</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -151,7 +151,7 @@
                 </div>
                 <div class="flex mt-1 justify-between items-center flex-wrap">
                   <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="dec"><i data-feather="arrow-left"></i></button>
-                  <?= htmlspecialchars($limit)?>
+                  <?= htmlspecialchars($limit==0 ? 1 : $limit/5 + 1)?>
                   <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="inc"><i data-feather="arrow-right"></i></button>
                 </div>
               </form> <!-- Form ends -->
