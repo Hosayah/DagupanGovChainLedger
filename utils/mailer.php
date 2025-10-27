@@ -7,7 +7,6 @@ require "../../../vendor/phpmailer/phpmailer/src/Exception.php";
 require '../../../vendor/phpmailer/phpmailer/src/PHPMailer.php';
 require '../../../vendor/phpmailer/phpmailer/src/SMTP.php';
 
-
 function send_otp($toEmail, $otp) {
     $mail = new PHPMailer(true);
     try {
@@ -16,7 +15,7 @@ function send_otp($toEmail, $otp) {
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'dagupangovledger@gmail.com';  // your gmail
-        $mail->Password   = 'mvwl zkyw tqlx sszh';     // your app password
+        $mail->Password   = 'MAIL_PASSWORD_SAMPLE';     // your app password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 

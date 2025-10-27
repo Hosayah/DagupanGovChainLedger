@@ -8,10 +8,12 @@ $dotenv->load();
 class ApiKey{
     private $geminiAPI;
     private $ipfsAPI;
+    private $mailPassword;
 
     public function __construct() {
         $this->geminiAPI = $_ENV['GEMINI_API_KEY'] ?? '';
         $this->ipfsAPI = $_ENV['IPFS_JWT'] ?? '';
+        $this->mailPassword = $_ENV['MAIL'] ?? '';
     }
 
     public function getGeminiApi(): string{
@@ -19,6 +21,9 @@ class ApiKey{
     }
     public function getIpfsApi(): string{
         return $this->ipfsAPI;
+    }
+    public function getMailPass(): string{
+        return $this->mailPassword;
     }
 }
 
