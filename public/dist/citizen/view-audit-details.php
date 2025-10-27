@@ -6,10 +6,16 @@ include("../../../DAO/ProjectDao.php");
 include("../../../DAO/RecordDao.php");
 include("../../../DAO/AuditDao.php");
 include("../../../DAO/UserDao.php");
+include("../../../DAO/AuditTrailDAO.php");
 include("../../../services/IpfsUploader.php");
 include("../../../services/blockchain.php");
+require '../../../vendor/autoload.php';
+include("../../../utils/constants/api.php");
+include("./controller/tablePageController.php");
 
-$jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI5ZGM2N2E5Mi0wMmUzLTRkYzAtYjQ5Yy0zOTUyMmY3NzU4NTgiLCJlbWFpbCI6ImNhdGFiYXlqb3NpYWgxOUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicGluX3BvbGljeSI6eyJyZWdpb25zIjpbeyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJGUkExIn0seyJkZXNpcmVkUmVwbGljYXRpb25Db3VudCI6MSwiaWQiOiJOWUMxIn1dLCJ2ZXJzaW9uIjoxfSwibWZhX2VuYWJsZWQiOmZhbHNlLCJzdGF0dXMiOiJBQ1RJVkUifSwiYXV0aGVudGljYXRpb25UeXBlIjoic2NvcGVkS2V5Iiwic2NvcGVkS2V5S2V5IjoiMDJiODlmNzNmYWY3ODhmOTBlNjYiLCJzY29wZWRLZXlTZWNyZXQiOiIzY2UxNzE3YmZkYjRlOTgzZjRjMmJmYzllYWMwMTM5NWQxMmM0YWQyMTQ4M2RkMWU2OWMzZmYxNmNmMzM3ZjFjIiwiZXhwIjoxNzkxNzA3MTUyfQ.uqpmqJ8qMpGe8-O6l3sQlYrs0wToLZKJBiLhJqH7hZ4"; 
+
+$api = new ApiKey();
+$jwt = $api->getIpfsApi();
 $ipfsUploader = new PinataUploader($jwt);
 $projectDao = new ProjectDao($conn);
 $userDao = new UserDao($conn);
@@ -58,6 +64,18 @@ print_r( $auditor, true) .'<br>Blockchain details:' .
 print_r( $block[$audit_id-1], true) .'<br>Auditor Details' .
 print_r($user, true);
 //echo $context;
+
+if (isset($_GET['search_term']) && $_GET['search_term'] !== '') {
+  $_SESSION['limit'] = 0;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && !isset($_GET['next'])) {
+    $_SESSION['limit'] = 0;
+}
+$limit = $_SESSION['limit'];
+$user_id = $_SESSION["user"]["id"];
+$trailDao = new AuditTrailDao($conn);
+$search_term = $_GET['search_term'] ?? '';
+$auditList = $trailDao->getTrailByAuditIdWithSearch($result['audit_id'],$limit, $search_term);
 ?>
 
 <!doctype html>
@@ -173,6 +191,79 @@ print_r($user, true);
                 <dt class="col-span-12 sm:col-span-3 font-semibold">Date & Time:</dt>
                 <dd class="col-span-12 sm:col-span-9"><?= htmlspecialchars($result['audited_at'])?></dd>
               </dl>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12">
+          <div class="card">
+            <div class="card-header flex justify-between">
+              <h5 class="mt-4">Recent Trail</h5>
+               <form method="GET" id="filterForm">
+                <input type="hidden" name="id" value="<?= $audit_id ?>">
+                 <input type="hidden" name="action" value="edit">
+                  <input type="text" name="search_term" id="searchInput" placeholder="Search by action, note, auditor name"
+                    value="<?php echo htmlspecialchars($search_term); ?>" class="border-2 shadow-2xl w-150 p-2" />
+                  <button type="submit" class="btn btn-transparent"><a href="#"><i data-feather="search"></i></a></button>
+              </form>
+            </div>
+            <div class="card-body">
+              <form class="form-horizontal" method="POST"> <!-- Form elements -->
+                <div class="table-responsive">
+                  <?php if (isset($_SESSION['flash'])): ?>
+                    <p style="text-align:center; color:green; font-weight:bold;">
+                      <?= htmlspecialchars($_SESSION['flash']) ?>
+                    </p>
+                    <?php unset($_SESSION['flash']); ?>
+                  <?php endif; ?>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr class="bg-dark text-white text-center font-weight-bold">
+                        <th class="font-weight-bold">Trail ID</th>
+                        <th class="font-weight-bold">Audit ID</th>
+                        <th class="font-weight-bold">Action</th>
+                        <th class="font-weight-bold">Note</th>
+                        <th class="font-weight-bold">Performed By:</th>
+                        <th class="font-weight-bold">Submitted at</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php if ($auditList->num_rows > 0): ?>
+                        <?php while ($row = $auditList->fetch_assoc()): ?>
+                          <tr>
+                            <td>
+                              <h6 class="mb-0">AUTR-ID-<?= htmlspecialchars($row['trail_id']) ?></h6>
+                            </td>
+                            <td>
+                              <h6 class="mb-1">AU-ID-<?= htmlspecialchars($row['audit_id']) ?></h6>
+                            </td>
+                            <td>
+                              <h6 class="mb-0"><?= htmlspecialchars($row['action']) ?></h6>
+                            </td>
+                            <td>
+                              <h6 class="mb-1"><?= htmlspecialchars($row['note']) ?></h6>
+                            </td>
+                            <td>
+                              <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['performed_by']) ?></h6>
+                            </td>
+                            <td>
+                              <h6 class="mb-1"><?= htmlspecialchars($row['created_at']) ?></h6>
+                            </td>
+                          </tr>
+                        <?php endwhile; ?>
+                      <?php else: ?>
+                        <tr>
+                          <td colspan="8" style="text-align:center;">No Audits found.</td>
+                        </tr>
+                      <?php endif; ?>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="flex mt-1 justify-between items-center flex-wrap">
+                  <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="dec"><i data-feather="arrow-left"></i></button>
+                  <?= htmlspecialchars($limit==0 ? 1 : $limit/5 + 1)?>
+                  <button type="submit" class="btn mx-auto shadow-2xl" name="next" value="inc"><i data-feather="arrow-right"></i></button>
+                </div>
+              </form> <!-- Form ends -->
             </div>
           </div>
         </div>

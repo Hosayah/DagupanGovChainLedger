@@ -55,7 +55,6 @@
            <ul class="pc-submenu">
              <li class="pc-item"><a class="pc-link" href="../admin/approved-accounts.php">Active Accounts</a></li>
              <li class="pc-item"><a class="pc-link" href="../admin/rejected-accounts.php">Rejected Accounts</a></li>
-             <li class="pc-item"><a class="pc-link" href="../admin/remove-admins.php">Remove Admin</a></li>
              <li class="pc-item"><a class="pc-link" href="../admin/suspended-accounts.php">Suspended Accounts</a></li>
            </ul>
          </li>

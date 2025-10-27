@@ -1,75 +1,7 @@
 <?php
 session_start();
-include("../../../config/config.php");
-require_once("../../../utils/mailer.php"); // adjust path as needed
+include("./controller/verifyController.php");
 
-$msg = '';
-$step = 1; // 1 = enter email, 2 = enter OTP
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-  // Step 1: Send OTP
-  if (isset($_POST["action"]) && $_POST["action"] === "send_otp") {
-    $email = trim($_POST["email"]);
-
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows === 0) {
-      $msg = "❌ Email not found.";
-    } else {
-      $user = $result->fetch_assoc();
-
-      if ($user['status'] !== 'approved') {
-        $msg = "⚠️ Account is not active.";
-      } else {
-        // Generate OTP
-        $otp = rand(100000, 999999);
-        $_SESSION['otp'] = $otp;
-        $_SESSION['otp_email'] = $email;
-        $_SESSION['otp_expiry'] = time() + 300; // 5 minutes
-
-        if (send_otp($email, $otp)) {
-          $msg = "✅ OTP sent to your email.";
-          $step = 2;
-        } else {
-          $msg = "❌ Failed to send OTP. Try again." . $otp;
-        }
-      }
-    }
-
-    $stmt->close();
-  }
-
-  // Step 2: Verify OTP
-  if (isset($_POST["action"]) && $_POST["action"] === "verify_otp") {
-    $enteredOtp = trim($_POST["otp"]);
-
-    if (!isset($_SESSION['otp']) || !isset($_SESSION['otp_expiry'])) {
-      $msg = "❌ No OTP request found.";
-    } elseif (time() > $_SESSION['otp_expiry']) {
-      $msg = "⚠️ OTP expired. Please resend.";
-      unset($_SESSION['otp']);
-      unset($_SESSION['otp_email']);
-      unset($_SESSION['otp_expiry']);
-    } elseif ($enteredOtp == $_SESSION['otp']) {
-      $_SESSION['verified_email'] = $_SESSION['otp_email'];
-
-      // clear OTP
-      unset($_SESSION['otp']);
-      unset($_SESSION['otp_email']);
-      unset($_SESSION['otp_expiry']);
-
-      header("Location: ./forgotPassword.php");
-      exit();
-    } else {
-      $msg = "❌ Invalid OTP.";
-      $step = 2;
-    }
-  }
-}
 ?>
 
 <!DOCTYPE html>

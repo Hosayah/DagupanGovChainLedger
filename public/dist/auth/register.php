@@ -1,5 +1,7 @@
 <?php
 session_start();
+require "./controller/registerController.php";
+/*
 include("../../../config/config.php"); // DB connection file
 include("../../../services/blockchain.php");
 
@@ -96,7 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       }
     }
   }
-}
+} */
 ?>
 
 <!DOCTYPE html>

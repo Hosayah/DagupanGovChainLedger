@@ -55,6 +55,7 @@
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
+    <link rel="stylesheet" href="../../src/output.css">
   </head>
 
   <body>

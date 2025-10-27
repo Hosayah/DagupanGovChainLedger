@@ -129,7 +129,7 @@
                             <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0">USER-ID<?= htmlspecialchars($row['audit_by']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">
