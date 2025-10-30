@@ -16,12 +16,12 @@ async function main() {
   console.log("GovSpendingLedger deployed to:", contractAddress);
 
   // Define role constants (must match contract)
-  const GOV_AGENCY_ROLE = ethers.id("GOV_AGENCY_ROLE");
-  const AUDITOR_ROLE = ethers.id("AUDITOR_ROLE");
+ // const GOV_AGENCY_ROLE = ethers.id("GOV_AGENCY_ROLE");
+  //const AUDITOR_ROLE = ethers.id("AUDITOR_ROLE");
 
   // Assign roles
-  await ledger.grantRole(GOV_AGENCY_ROLE, govAgency.address);
-  await ledger.grantRole(AUDITOR_ROLE, auditor.address);
+  //await ledger.grantRole(GOV_AGENCY_ROLE, govAgency.address);
+  //await ledger.grantRole(AUDITOR_ROLE, auditor.address);
 
   console.log(`Granted GOV_AGENCY_ROLE to ${govAgency.address}`);
   console.log(`Granted AUDITOR_ROLE to ${auditor.address}`);
