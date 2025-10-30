@@ -264,7 +264,7 @@ $audits = $auditDao->getAuditCounters(1);
           </span>
           <div class="text-left">
             <h3 class="text-2xl font-semibold leading-tight"><?= htmlspecialchars($records['total']) ?></h3>
-            <p class="text-gray-500">Active Government Projects</p>
+            <p class="text-gray-500">Total Government Projects</p>
           </div>
         </div>
       </div>

@@ -50,7 +50,7 @@ class AuditDAO {
 
     public function getAuditByUserId($id, $limit = 0): mixed {
         $sql = "
-            SELECT * FROM audits WHERE audit_by = ? LIMIT 5 OFFSET ?;
+            SELECT * FROM audits WHERE audit_by = ? ORDER BY audited_at DESC LIMIT 5 OFFSET ?;
         ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("ii", $id, $limit);

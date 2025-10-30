@@ -35,29 +35,49 @@ $type = $result['type'] ??'';
 $link = $ipfsUploader->getGatewayUrl($record['document_cid']);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $project_id = $result["project_id"];
+    $project_id = intval($result["project_id"]);
     $title = trim($_POST["title"]);
     $category = trim($_POST["category"]);
     $description = trim($_POST["description"]);
+    $msg = "";
 
-    // Check for existing title
-    $check = $conn->prepare("SELECT * FROM projects WHERE title = ?");
-    $check->bind_param("s", $title);
+    // --- Validation ---
+    if (empty($title) || strlen($title) < 3) {
+        $msg = "<script>alert('⚠️ Project title must be at least 3 characters long.');</script>";
+        echo $msg;
+        exit;
+    }
+    if (empty($category)) {
+        $msg = "<script>alert('⚠️ Please select a category.');</script>";
+        echo $msg;
+        exit;
+    }
+    if (empty($description) || strlen($description) < 10) {
+        $msg = "<script>alert('⚠️ Description must be at least 10 characters long.');</script>";
+        echo $msg;
+        exit;
+    }
+
+    // --- Check if title already exists but belongs to another project ---
+    $check = $conn->prepare("SELECT project_id FROM projects WHERE title = ? AND project_id != ?");
+    $check->bind_param("si", $title, $project_id);
     $check->execute();
     $checkResult = $check->get_result();
+
     if ($checkResult->num_rows > 0) {
-        $msg = "<script>alert('⚠️ Project title already exists.');</script>";
+        $msg = "<script>alert('⚠️ Project title already exists under another project. Please choose a unique title.');</script>";
         echo $msg;
     } else {
-        // update project into database
+        // --- Proceed with update ---
         if ($projectDao->updateProject($title, $category, $description, $project_id)) {
-            header("Location: edit-project.php?id=$project_id&action=edit&updated=1");
+            echo "<script>alert('✅ Project updated successfully!'); window.location.href='edit-project.php?id=$project_id&action=edit&updated=1';</script>";
             exit;
         } else {
-            echo "<script>alert('❌ Error inserting project');</script>";
+            echo "<script>alert('❌ Error updating project. Please try again.');</script>";
         }
     }
 }
+
 ?>
 
 <!doctype html>
@@ -134,7 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               <form class="" method="POST" enctype="multipart/form-data"> <!-- Form elements -->
                 <div class="mb-3">
                   <label for="floatingInput" class="form-label">Project Title:</label>
-                  <input type="text" class="form-control" name="title" id="floatingInput" value="<?= htmlspecialchars($result['title'])?>" placeholder="E.g Flood Control Project" />
+                  <input type="text" class="form-control" name="title" id="floatingInput" value="<?= htmlspecialchars($result['title'])?>" placeholder="E.g Flood Control Project" required/>
                 </div>
                 <div class="mb-4">
                   <label for="floatingInput1" class="form-label">Category:</label>
@@ -143,7 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <p>Infrastructure</p>
                     <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Education" <?= htmlspecialchars($category == 'Education' ? 'checked':'')?> required/> 
                     <p>Education</p>
-                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Argriculture" <?= htmlspecialchars($category == 'Agriculture' ? 'checked':'')?> required/> 
+                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Agriculture" <?= htmlspecialchars($category == 'Agriculture' ? 'checked':'')?> required/> 
                     <p>Agriculture</p>
                     <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Others" <?= htmlspecialchars($category == 'Others' ? 'checked':'')?> required/> 
                     <p>Other</p>

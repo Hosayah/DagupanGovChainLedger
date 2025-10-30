@@ -104,13 +104,23 @@ function addAuditor($contract, $adminWallet, $agencyWallet){
 //getCounts($contract);
 
 function getBalance($web3, $address) {
-    try {
-        $balance = $web3->eth->getBalance($address);
-        return $balance->toString();
-    } catch (Exception $e) {
-        return null;
-    }
+    $balance = null;
+
+    $web3->eth->getBalance($address, function ($err, $result) use (&$balance) {
+        if ($err !== null) {
+            $balance = null;
+            return;
+        }
+
+        // $result is a BigNumber object, so convert it properly
+        $balance = $result->toString(); // Wei
+    });
+
+    // wait a short time to let async call finish
+    usleep(200000); // 0.2 sec (can be adjusted)
+    return $balance;
 }
+
 
 
 
@@ -284,8 +294,8 @@ function submitAudit($contract, $from, $recordId, $docHash, $result)
     usleep(200000);
     return $txResult;
 }
-error_reporting(0);
-ini_set('display_errors', 0);
+//error_reporting(0);
+//ini_set('display_errors', 0);
 function getAuditsAsArray($contract, $recordId)
 {
     $result = [];
@@ -345,6 +355,7 @@ function getAuditsAsArray($contract, $recordId)
 
     return $result;
 }
+
 
 //$data = getAuditsAsArray($contract, 1);
 

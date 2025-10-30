@@ -16,20 +16,20 @@
 
   $pcounters = $projectDao->getProjectCounters($user_id);
   $auditCounter = $auditDao->getAuditCounters($user_id);
+  $total = $auditCounter['auditorTotal'] > 0 ? $auditCounter['auditorTotal'] : 1;
   
   $totalAudits = $auditCounter['total'] > 0 ? $auditCounter['total'] : 1;
   $totalPassed = $auditCounter['passed'] > 0 ? $auditCounter['passed'] : 1;
   $totalFlagged = $auditCounter['flagged'] > 0 ? $auditCounter['flagged'] : 1;
   $totalRejected = $auditCounter['rejected'] > 0 ? $auditCounter['rejected'] : 1;
   
-  $auditsPercentage   = round(($auditCounter['auditorTotal']   / $totalAudits) * 100, 2);
-  $passedPercentage   = round(($auditCounter['auditorPassed']   / $totalPassed) * 100, 2);
-  $flaggedPercentage   = round(($auditCounter['auditorFlagged']   / $totalFlagged) * 100, 2);
-  $rejectedPercentage   = round(($auditCounter['auditorRejected']   / $totalRejected) * 100, 2);
+  $auditsPercentage   = round(($auditCounter['auditorTotal']   / $total) * 100, 2);
+  $passedPercentage   = round(($auditCounter['auditorPassed']   / $total) * 100, 2);
+  $flaggedPercentage   = round(($auditCounter['auditorFlagged']   / $total) * 100, 2);
+  $rejectedPercentage   = round(($auditCounter['auditorRejected']   / $total) * 100, 2);
 ?>
   <!doctype html>
   <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
-
   <head>
     <title>Dashboard</title>
     <meta charset="utf-8" />
@@ -240,7 +240,7 @@
                             <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0"><?= htmlspecialchars($row['audit_by']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                           <td>
                             <h6 class="text-muted">

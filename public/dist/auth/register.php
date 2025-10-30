@@ -312,16 +312,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 required>
             </div>
 
-
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-role">Role</label>
-              <input id="auditor-role" type="text" name="role" placeholder="Auditor / Investigator"
-                class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200"
-                required>
-            </div>
-
-            <div>
+            
+            <div class="sm:col-span-2">
               <label class="block text-sm font-medium text-gray-700 mb-1" for="auditor-contact">Contact Number</label>
               <input id="auditor-contact" type="text" name="contact" placeholder="+63 9xx xxx xxxx"
                 class="w-full p-3 border border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-200"

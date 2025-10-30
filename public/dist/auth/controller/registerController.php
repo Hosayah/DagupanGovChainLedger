@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password       = trim($_POST["password"] ?? '');
     $confirm        = trim($_POST["confirm"] ?? '');
     $name           = trim(preg_replace('/\s+/', ' ', $_POST["name"] ?? ''));
+    $fullName       = trim(preg_replace('/\s+/', ' ', $_POST["fullName"] ?? '')); 
     $contact        = trim(preg_replace('/\s+/', ' ', $_POST["contact"] ?? ''));
     $officeCode     = trim($_POST["officeCode"] ?? '');
     $position       = trim($_POST["position"] ?? '');
@@ -22,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $walletAddress  = trim($_POST["wallet"] ?? '');
 
     // --- Basic validation ---
-    if (empty($accountType) || empty($email) || empty($password) || empty($confirm)) {
+    if (empty($accountType) || empty($email) || empty($password) || empty($confirm) || empty($fullName)) {
         $msg = "❌ Please fill in all required fields.";
         return;
     }
@@ -64,8 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             return;
         }
 
-        if (empty($balance) || $balance < 1) {
-            $msg = "❌ Wallet must have at least 1 ETH.";
+        if (empty($balance)) {
+            $msg = "❌ Wallet must have at least 1 ETH." . $balance;
             return;
         }
     }
@@ -78,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         'account_type' => $accountType,
         'email' => $email,
         'password_hash' => $hashedPassword,
-        'full_name' => $name,
+        'full_name' => $fullName, // ✅ FIXED HERE
         'contact_number' => $contact
     ]);
 
@@ -121,4 +122,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     echo "<script>alert('$msg'); window.location='./login.php';</script>";
     exit;
 }
+
 ?>

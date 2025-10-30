@@ -38,7 +38,7 @@ $block = getRecordAsArray($contract, $record['record_id']);
 //echo $block['doc_hash'];
 //echo '0x' . $record['document_hash'];
 $docHash = '0x' . hash('sha256', $result['document_path']);
-$verified = ($docHash === $block['doc_hash']) ? '<abbr title="The record document has not been tampered" class="text-decoration-line: none;"><i class="ph-fill text-green-600 text-2xl ph-seal-check"></i></abbr>' : '<abbr title="The record document has been tampered." class="text-decoration-line: none;"><i class="ph-fill text-yellow-400 text-2xl ph-seal-warning"></i></abbr>';
+
 $userResult = $userDao->getUserByIdFromAgency($result["created_by"]) ?? [];
 $category = $result["category"] ?? '';
 $type = $result['type'] ??'';
@@ -76,6 +76,8 @@ $totalRejected = $auditCounter['rejected'] > 0 ? $auditCounter['rejected'] : 1;
 $passedPercentage   = round(($auditCounter['passed']   / $totalAudits) * 100, 2);
 $flaggedPercentage   = round(($auditCounter['flagged']   / $totalAudits) * 100, 2);
 $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100, 2);
+
+$verified = ($docHash === $block['doc_hash'] && $auditCounter['passed'] > 0) ? '<abbr title="The record document has not been tampered" class="text-decoration-line: none;"><i class="ph-fill text-green-600 text-2xl ph-seal-check"></i></abbr>' : '<abbr title="The record has been rejected (Check audit result)." class="text-decoration-line: none;"><i class="ph-fill text-yellow-400 text-2xl ph-seal-warning"></i></abbr>';
 ?>
 
 <!doctype html>
@@ -284,7 +286,7 @@ $rejectedPercentage   = round(($auditCounter['rejected']   / $totalAudits) * 100
                             <h6 class="mb-1"><?= htmlspecialchars($row['result']) ?></h6>
                           </td>
                           <td>
-                            <h6 class="mb-0">USER-ID<?= htmlspecialchars($row['audit_by']) ?></h6>
+                            <h6 class="mb-0">USER-ID-<?= htmlspecialchars($row['audit_by']) ?></h6>
                           </td>
                         </tr>
                       <?php endwhile; ?>

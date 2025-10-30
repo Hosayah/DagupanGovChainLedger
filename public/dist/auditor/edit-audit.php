@@ -40,12 +40,12 @@ $link = $ipfsUploader->getGatewayUrl($result['document_cid']);
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $audit_id = $result["audit_id"];
-  $title = trim($_POST["title"]);
-  $summary = trim($_POST["summary"]);
+  $title = trim(preg_replace('/\s+/',' ',$_POST["title"]));
+  $summary = trim(preg_replace('/\s+/', ' ', $_POST["summary"]));
 
   // Check for existing title
-  $check = $conn->prepare("SELECT * FROM audits WHERE title = ?");
-  $check->bind_param("s", $title);
+  $check = $conn->prepare("SELECT * FROM audits WHERE title = ? AND audit_id != ?");
+  $check->bind_param("ss", $title, $audit_id);
   $check->execute();
   $checkResult = $check->get_result();
   if ($checkResult->num_rows > 0) {

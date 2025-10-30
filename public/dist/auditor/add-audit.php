@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php-error.log');
+error_reporting(E_ALL);
 session_start();
 include("../../../config/config.php");
 include("../../../services/blockchain.php");
@@ -158,11 +162,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                   <label for="floatingInput" class="form-label">Project Title:</label>
                   <input type="text" class="form-control" name="title" id="floatingInput" value="<?= $title ?>"
                     <?= $title ? 'readonly' : '' ?> required />
-                </div>
-                <div class="mb-3">
-                  <label for="floatingInput" class="form-label">Audit Title:</label>
-                  <input type="text" class="form-control" name="title" id="floatingInput"
-                    placeholder="E.g Flood Control Audit" required />
                 </div>
                 <div class="mb-3">
                   <label for="floatingInput" class="form-label">Record ID:</label>

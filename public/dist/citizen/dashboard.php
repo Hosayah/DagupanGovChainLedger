@@ -225,8 +225,8 @@
                       <th class="font-weight-bold">Title</th>
                       <th class="font-weight-bold">Category</th>
                       <th class="font-weight-bold">Description</th>
-                      <th class="font-weight-bold">Created By</th>
-                      <th class="font-weight-bold">Created at</th>
+                      <th class="font-weight-bold">Created At</th>
+                      <th class="font-weight-bold">Action</th>
                     </tr>
                     </tr>
                   </thead>

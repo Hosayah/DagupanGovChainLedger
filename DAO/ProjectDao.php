@@ -9,7 +9,7 @@ class ProjectDAO {
     // get all users
     public function getAllProjects($limit = 0): mixed {
         $sql = "
-            SELECT * FROM projects LIMIT 5 OFFSET ?;
+            SELECT * FROM projects ORDER BY created_at DESC LIMIT 5 OFFSET ?;
         ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $limit);
@@ -50,7 +50,7 @@ class ProjectDAO {
 
     public function getProjectByUserId($id, $limit = 0): mixed {
         $sql = "
-            SELECT * FROM projects WHERE created_by = ? LIMIT 5 OFFSET ?;
+            SELECT * FROM projects WHERE created_by = ? ORDER BY created_at DESC LIMIT 5 OFFSET ?;
         ";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("ii", $id, $limit);

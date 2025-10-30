@@ -1,4 +1,9 @@
 <?php
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/php-error.log');
+error_reporting(E_ALL);
+
 session_start();
 include("../../../config/config.php");
 include("../../../services/blockchain.php");
@@ -8,6 +13,7 @@ include("../../../utils/constants/api.php");
 
 $api = new ApiKey();
 $jwt = $api->getIpfsApi();
+$uploader = new PinataUploader($jwt);
 
 $wallet = $_SESSION["user"]["wallet_address"];
 $isRole = hasRole($contract, $govRole, $wallet);
@@ -16,10 +22,10 @@ if (!$isRole) {
 }
 
 $count = getCounts($contract);
-//echo $count;
 $msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $errors = [];
     $user_id = $_SESSION["user"]["id"];
     $title = trim($_POST["title"]);
     $category = trim($_POST["category"]);
@@ -27,20 +33,62 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $record_type = trim($_POST["record_type"]);
     $amount = trim($_POST["amount"]);
 
-    // Check for existing title
-    $check = $conn->prepare("SELECT * FROM projects WHERE title = ?");
+    // ✅ Validate title
+    if (empty($title) || strlen($title) < 5 || strlen($title) > 100) {
+        $errors[] = "Project title must be between 5 and 100 characters.";
+    }
+
+    // ✅ Validate category
+    $allowedCategories = ["Infrastructure", "Education", "Agriculture", "Others"];
+    if (!in_array($category, $allowedCategories)) {
+        $errors[] = "Invalid category selected.";
+    }
+
+    // ✅ Validate description
+    if (empty($description) || strlen($description) < 10) {
+        $errors[] = "Description must be at least 10 characters.";
+    }
+
+    // ✅ Validate record type
+    $allowedTypes = ["budget", "invoice", "contract"];
+    if (!in_array($record_type, $allowedTypes)) {
+        $errors[] = "Invalid record type.";
+    }
+
+    // ✅ Validate amount
+    if (!preg_match('/^\d{1,16}(\.\d{1,2})?$/', $amount)) {
+        $errors[] = "Amount must be a valid number with up to 2 decimal places (max 18 digits total).";
+    } elseif ((float)$amount <= 0) {
+        $errors[] = "Amount must be greater than zero.";
+    }
+
+    // ✅ Validate file upload
+    if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = "Please upload a valid document file.";
+    } else {
+        $allowedExts = ['pdf', 'docx', 'jpg', 'jpeg', 'png'];
+        $fileExt = strtolower(pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION));
+        if (!in_array($fileExt, $allowedExts)) {
+            $errors[] = "Invalid file type. Allowed: PDF, DOCX, JPG, PNG.";
+        }
+        if ($_FILES['document']['size'] > 5 * 1024 * 1024) { // 5MB
+            $errors[] = "File must not exceed 5MB.";
+        }
+    }
+
+    // ✅ Check for duplicate title
+    $check = $conn->prepare("SELECT project_id FROM projects WHERE title = ?");
     $check->bind_param("s", $title);
     $check->execute();
-    $checkResult = $check->get_result();
+    if ($check->get_result()->num_rows > 0) {
+        $errors[] = "A project with this title already exists.";
+    }
 
-    if ($checkResult->num_rows > 0) {
-        $msg = "<script>alert('⚠️ Project title already exists.');</script>";
-        //echo $msg;
+    // 🚫 If validation failed, show all errors
+    if (!empty($errors)) {
+        $msg = "<script>alert('⚠️ Please correct the following:\\n- " . implode("\\n- ", $errors) . "');</script>";
     } else {
-        if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
-          die("⚠️ No file uploaded or upload error occurred.");
-        }
-        // 1️⃣ Upload document to Pinata
+        // ✅ Upload to Pinata
         try {
             $cid = $uploader->uploadDocument($_FILES['document']);
             $documentUrl = $uploader->getGatewayUrl($cid);
@@ -48,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             die("❌ IPFS upload failed: " . $e->getMessage());
         }
 
-        // 2️⃣ Insert project into database
+        // ✅ Insert project into DB
         $stmt = $conn->prepare("
           INSERT INTO projects (title, category, description, document_path, created_by)
           VALUES (?, ?, ?, ?, ?)
@@ -57,13 +105,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($stmt->execute()) {
             $projectId = $conn->insert_id;
-
-            // 3️⃣ Submit to blockchain
             $docHash = hash('sha256', $documentUrl);
             $txRes = submitSpending($contract, $wallet, '0x' . $docHash, $record_type);
-            $record = getRecordAsArray($contract, $projectId);
 
-            // 4️⃣ Mirror record in DB
             $recordStmt = $conn->prepare("
               INSERT INTO records (project_id, record_type, amount, document_hash, document_cid, blockchain_tx, submitted_by)
               VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -71,14 +115,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $recordStmt->bind_param("isssssi", $projectId, $record_type, $amount, $docHash, $cid, $txRes, $user_id);
             $recordStmt->execute();
 
-            $msg = "✅ Record submitted successfully.";
-            echo "<script>alert('✅ Project successfully recorded and stored on blockchain!');</script>";
+            $msg = "<script>alert('✅ Project successfully recorded and stored on blockchain!');</script>";
         } else {
-            $msg = "❌ Error inserting project: " . $stmt->error;
+            $msg = "<script>alert('❌ Database error: " . addslashes($stmt->error) . "');</script>";
         }
     }
 }
 ?>
+
 
 <!doctype html>
 <html lang="en" data-pc-preset="preset-1" data-pc-sidebar-caption="true" data-pc-direction="ltr" dir="ltr" data-pc-theme="light">
@@ -162,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <p>Infrastructure</p>
                     <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Education" required/> 
                     <p>Education</p>
-                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Argriculture" required/> 
+                    <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Agriculture" required/> 
                     <p>Agriculture</p>
                     <input type="radio" class="mr-1.5 w-20" name="category" id="floatingInput1" value="Others" required/> 
                     <p>Other</p>
