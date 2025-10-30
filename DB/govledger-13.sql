@@ -115,20 +115,6 @@ CREATE TABLE `audits` (
   `audited_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `audits`
---
-
-INSERT INTO `audits` (`audit_id`, `record_id`, `title`, `summary`, `result`, `document_hash`, `document_cid`, `tx_hash`, `audit_by`, `audited_at`) VALUES
-(1, 1, 'Dagupan River Flood Control Project (DPWH)', 'The audit of the Dagupan River Flood Control Project revealed that the project was implemented in accordance with standard government procurement and construction guidelines. However, minor delays were observed in the procurement of materials due to weather disturbances', 'PASSED', '63f7d34d64e085c1a468018540cf71efd29d13c809b01998185ed0917dac77b7', 'QmPJTKV6HLjuHmVzqZ73B5cPoV3Q55dKbwZ3VG1VUpJqdV', '0x0ec16b4fbcefe27a14fc436fb76b767d640687eb0f494c00622bcf66d764b90f', 13, '2025-10-15 14:07:42'),
-(2, 2, 'Audit on Dagupan City Road Widening and Drainage Improvement Project', 'The inconsistency between the recorded metadata and the project’s documented total cost raises material concerns regarding accuracy and data integrity. The matter is hereby flagged for clarification and corrective action prior to further financial monitoring and disbursement auditing', 'FLAGGED', '9915ac1a647cc3eaa8e359cba7d8bde8f5acaab0236443516188e3b7b6015096', 'QmajssFNrUjYfvjPtsvaNxDZXCGuooP4Muub4FSHktiaiH', '0x8c31112ccc7ffadaba2b17184a70bca88da20f8512c330b7bad1f1fddb73d904', 28, '2025-10-28 07:28:27'),
-(3, 1, 'Dagupan River Flood Control Improvement Project', 'Project financial metadata is correct and consistent with its documentary counterpart. No further clarification is necessary. The record is hereby marked as Passed', 'PASSED', 'c59a6a3cc817bd1bc183f2b8ebd3f363bf9b89718d48ca70717397a2ab031561', 'QmTmX2Qsbr1FFvULRedSqrn46xWwz75tcFAQENzKGWd2QK', '0x04d9f4246ea04cdd5f5507222034f02b6881fed894f5b52ea3c95ee5ea48a701', 28, '2025-10-28 07:59:14'),
-(4, 3, 'Dagupan City Educational Facilities Improvement Project', 'The project cannot be marked as “Passed” because required pre-implementation documentation is incomplete. Although no financial anomaly exists, governance and compliance procedures must be satisfied before funds can be mobilized.', 'FLAGGED', '08b4c4c0e4d5f1ef4a95d3c8b8bdcb2398b822d44c8986e22a6cb3c55e50b5da', 'QmXQzKsA7y5mvsTfjSU1w9mPBRCsyp6XAKbmGq7gaywh8v', '0xdf35dfaccbe5d3a6dc4626a6e06a0c58f19a6ce0cb1f088151a79787ef274c16', 29, '2025-10-28 08:08:17'),
-(5, 4, 'Dagupan City School-Based Digital Learning Enhancement Project', 'The project is not eligible for implementation because critical prerequisites under DepEd ICT governance policy, priority ranking validation, and facility-readiness assessment are missing. Until these regulatory requirements are satisfied, the project cannot be endorsed for funding utilization or procurement activities.', 'REJECTED', '0427486a5a21485ff5c61de10a5a07ea78e6f7f400c19294236477779a1a453d', 'QmaiwhBrHp9FJUE2cFJSQji7Yfr97JppvSBG4Z9LLSREDr', '0xe885c3c4d4018560e6d0814099834d251074608c0644e123dd88141b0bdbc1c8', 29, '2025-10-28 08:22:11'),
-(6, 5, 'Dagupan Urban Agri-Resilience and Community Food Security Project', 'The presented documentation is complete, aligned with LGU resilience and food security objectives, and supported by a clear implementation and monitoring structure. The financial declaration is consistent with metadata and the sustainability features are sufficiently established. The project is hereby approved and cleared for rollout', 'PASSED', '50dedb946b76c091435ded39bbf2cb6b8407f4bf3c7862bc88ef1fad16aa050f', 'QmQk9ZvD3RXDN2Kx5BBsqwEhszp1uMyQCKtsJG6zd3RvvR', '0xcc0323908d4fe414aa13be4ebaedf0ec843eed7c4aadfc62950ca165def2533c', 13, '2025-10-28 08:49:49'),
-(7, 6, 'Dagupan City School Feeding and Nutrition Support Program', 'Based on the review of documents, funding allocation, intended beneficiaries, and program design, the project is found to be consistent with DepEd’s learner-welfare directive as outlined under the School-Based Feeding Program (SBFP) framework.', 'PASSED', '2f7b8bcf0b9ca200d76adec969bf6219cbebba953085ff5b6ba4a5fb752c5c82', 'QmV4YUpohoeaN9Se2x7GAggv3baAWC76AfSsRjwXuizFA4', '0xb6d8ca58665c8d852f7185eedb716b4930294953cd5f93cf95d8b8218daa18b7', 13, '2025-10-28 09:08:31'),
-(8, 7, 'Dagupan Climate-Smart Aquaculture Development Project', 'This project aims to enhance sustainable aquaculture production in Dagupan City by supporting the modernization of fishpond operations, introducing climate-resilient practices, and providing technical support to local fisherfolk. The initiative builds on Dagupan\'s identity as a leading bangus-producing city while ensuring long-term ecological balance and livelihood security.', 'PASSED', 'c56095d937c4ce2d8ad2dfa2044935b5a66c73b311edfb6cf866feff34094cc2', 'QmYHx4A32Efd1cytRVM2FzK5Jms3R32GiTPzypmW9BJtrw', '0x7ebdcd0af7c494cfd13dca05bf2a91bc8685c51649831e41f8ea2f928dde3ed9', 13, '2025-10-28 13:29:38');
-
 -- --------------------------------------------------------
 
 --
@@ -143,28 +129,6 @@ CREATE TABLE `audit_trail` (
   `performed_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `audit_trail`
---
-
-INSERT INTO `audit_trail` (`trail_id`, `audit_id`, `action`, `note`, `performed_by`, `created_at`) VALUES
-(1, 1, 'COMMENTED', 'Initial audit', 13, '2025-10-27 11:05:54'),
-(2, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:14:39'),
-(3, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:29:48'),
-(4, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:35:00'),
-(5, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:35:13'),
-(6, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:36:57'),
-(7, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:40:47'),
-(8, 1, 'COMMENTED', 'Audit details updated', 13, '2025-10-27 11:42:16'),
-(9, 2, 'COMMENTED', 'Initial submission of audit', 28, '2025-10-28 07:28:27'),
-(10, 2, 'COMMENTED', 'Audit details updated', 28, '2025-10-28 07:34:46'),
-(11, 3, 'COMMENTED', 'Initial submission of audit', 28, '2025-10-28 07:59:14'),
-(12, 4, 'COMMENTED', 'Initial submission of audit', 29, '2025-10-28 08:08:17'),
-(13, 5, 'COMMENTED', 'Initial submission of audit', 29, '2025-10-28 08:22:11'),
-(14, 6, 'COMMENTED', 'Initial submission of audit', 13, '2025-10-28 08:49:49'),
-(15, 7, 'COMMENTED', 'Initial submission of audit', 13, '2025-10-28 09:08:31'),
-(16, 8, 'COMMENTED', 'Initial submission of audit', 13, '2025-10-28 13:29:38');
 
 -- --------------------------------------------------------
 
@@ -181,20 +145,6 @@ CREATE TABLE `projects` (
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `projects`
---
-
-INSERT INTO `projects` (`project_id`, `title`, `category`, `description`, `document_path`, `created_by`, `created_at`) VALUES
-(1, 'Dagupan River Flood Control Improvement Project', 'Infrastructure', 'This project aims to strengthen flood protection along the Pantal and Calmay Rivers in Dagupan City, Pangasinan. The Department of Public Works and Highways (DPWH) initiated this project to mitigate recurrent flooding affecting major commercial and residential areas.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmTJvQWb9KeidE2JhKFuauJkF7CkQhArp9diS7LMEQ2CHm', 1, '2025-10-15 14:05:49'),
-(2, 'Dagupan City Road Widening and Drainage Improvement Project', 'Infrastructure', 'This project aims to reduce traffic congestion and enhance flood resilience along major thoroughfares in Dagupan City, Pangasinan. The Department of Public Works and Highways (DPWH) initiated this project to improve road capacity and address frequent flooding during heavy rainfall. The project involves road widening, drainage improvement, sidewalk rehabilitation, and installation of LED street lighting.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmZfsuBJRaDHEJ5M3LvVhZ8KbbVbUkenJafEhsAJnPfWgF', 1, '2025-10-16 06:09:21'),
-(3, 'Dagupan City Educational Facilities Improvement Project', 'Education', 'This project aims to enhance the learning environment in select public schools in Dagupan City by upgrading classrooms, providing modern learning equipment, and improving campus safety and accessibility.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmeTj6XiT4TMynfuCfEtBypwrgQFPeEpmBAJYobUdSBka7', 23, '2025-10-28 04:13:12'),
-(4, 'Dagupan City School-Based Digital Learning Enhancement Project', 'Education', 'This project aims to strengthen digital learning capacity in select public elementary and secondary schools in Dagupan City through the establishment of ICT laboratories, teacher digital skills upskilling, and integration of e-learning platforms. The initiative aligns with DepEd\'s goal of promoting future-ready, tech-enabled education.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmZjBUvVd3Zq3VZ4adzDxY2m5eCN9co2VsrzNEQAa9RvcZ', 23, '2025-10-28 04:24:29'),
-(5, 'Dagupan Urban Agri-Resilience and Community Food Security Project', 'Agriculture', 'This project aims to strengthen local food security and climate resilience in Dagupan City by supporting urban farming initiatives, providing farmer training programs, and promoting sustainable vegetable and aquaculture production at the community level.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmY6puZMDRLfP98Z3XiEzbkVcY4MSGMsTDq7Z47NQzFkYs', 27, '2025-10-28 06:31:03'),
-(6, 'Dagupan City School Feeding and Nutrition Support Program', 'Education', 'This project aims to improve student nutrition, health, and classroom performance in Dagupan City public schools through an enhanced school feeding initiative that integrates local agricultural sourcing, nutrition education, and community participation. The program supports DepEd’s thrust toward learner well-being and inclusive education.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmXn6UXv85jjuL5k7vQiNpZT3qzGRPtE3WwccjSezJQD3d', 23, '2025-10-28 09:04:34'),
-(7, 'Dagupan Climate-Smart Aquaculture Development Project', 'Agriculture', 'This project aims to enhance sustainable aquaculture production in Dagupan City by supporting the modernization of fishpond operations, introducing climate-resilient practices, and providing technical support to local fisherfolk. The initiative builds on Dagupan\'s identity as a leading bangus-producing city while ensuring long-term ecological balance and livelihood security.', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmdDH6YCoCTRSz1JCmUgYzP2iCLcSc638vEGpWTHuH1SxD', 27, '2025-10-28 13:21:29'),
-(8, 'Dagupan City Flood Mitigation and Riverbank Protection Project', 'Infrastructure', 'This project aims to strengthen flood resilience and riverbank stability in Dagupan City through the \r\nconstruction of slope protection structures, dredging, desilting, and drainage improvement along \r\nidentified flood-prone zones', 'https://plum-actual-elephant-371.mypinata.cloud/ipfs/QmatZYvQkMGKrcm9HPnkfhaa6vK2okNoWEcYexMc8ZdYgG', 1, '2025-10-29 02:41:35');
 
 -- --------------------------------------------------------
 
@@ -213,20 +163,6 @@ CREATE TABLE `records` (
   `submitted_by` int(11) NOT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `records`
---
-
-INSERT INTO `records` (`record_id`, `project_id`, `record_type`, `amount`, `document_hash`, `document_cid`, `blockchain_tx`, `submitted_by`, `submitted_at`) VALUES
-(1, 1, 'budget', 120000000.00, 'fea008bdc6197d29b3fa9494c38f380fee03a7dfb9b66e7d7a43cf19becc1f86', 'QmTJvQWb9KeidE2JhKFuauJkF7CkQhArp9diS7LMEQ2CHm', '0xf9d529906d361814d35dd3baa623f53412e12e70498fb3850ea4b16252899af2', 1, '2025-10-15 14:05:49'),
-(2, 2, 'budget', 100000.00, 'd82ef7226f7ca22de6873bce923833482541563afe5c659699cedc5cdd6f8b49', 'QmZfsuBJRaDHEJ5M3LvVhZ8KbbVbUkenJafEhsAJnPfWgF', '0x7152e0cc6462d3bd80ba22b7d7541c748b1f2a284477a951c0a3335e6bc7b6d3', 1, '2025-10-16 06:09:21'),
-(3, 3, 'budget', 58000000.00, '24afc39a882e3cac50f5fe6cb9005944c2076605f89c34c7c3c1f44e9ac4c2cc', 'QmeTj6XiT4TMynfuCfEtBypwrgQFPeEpmBAJYobUdSBka7', '0x708bb6f846c4fcc37081a36a907f5e2433f0ab04adeab41469f8c8428948b371', 23, '2025-10-28 04:13:12'),
-(4, 4, 'budget', 72000000.00, '16505cf7551e67c304bb5b4369fae6559ff0dc94d2fffc77639945d8ada7e2d3', 'QmZjBUvVd3Zq3VZ4adzDxY2m5eCN9co2VsrzNEQAa9RvcZ', '0x4efb881bbf3c7cf87727fba8ea49969a5a70bce50c40d13215bf733732f0919e', 23, '2025-10-28 04:24:30'),
-(5, 5, 'invoice', 36500000.00, '054b4ff5d530c4a159db6cf4832124679d84c5bba99f7fe0063a2adf62a8e975', 'QmY6puZMDRLfP98Z3XiEzbkVcY4MSGMsTDq7Z47NQzFkYs', '0xa364c056ff2ce0e52473fad4d0c867bb84472eed89df932f526770fcd60dc773', 27, '2025-10-28 06:31:03'),
-(6, 6, 'budget', 54000000.00, '8c3a33666beff13f295284d0e2f9a8dae50179d5f151d24a993c71390edc10a2', 'QmXn6UXv85jjuL5k7vQiNpZT3qzGRPtE3WwccjSezJQD3d', '0x9f7200aa06cbdc849e33872034aaa32e4d6002ba8af6b20a3a4204452777ca32', 23, '2025-10-28 09:04:34'),
-(7, 7, 'contract', 48500000.00, '230dead51f64c981b3c0bfc2659db5aa6814452c920a894d52186a6fbab91204', 'QmdDH6YCoCTRSz1JCmUgYzP2iCLcSc638vEGpWTHuH1SxD', '0xfb277c9cf377ed6885aba6e8e660b69ec8bddec1650a085838afcaf53ffc8c28', 27, '2025-10-28 13:21:29'),
-(8, 8, 'budget', 120000000.00, '7b91c781676fbc4f5be98701aae99cfc4b15bf23ec1030963c0538530c674f2b', 'QmatZYvQkMGKrcm9HPnkfhaa6vK2okNoWEcYexMc8ZdYgG', '0x4675a75cd6beafec3331814444e44b0cee2eaeadf930ec272df61a9709cbfda1', 1, '2025-10-29 02:41:35');
 
 -- --------------------------------------------------------
 
