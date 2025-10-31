@@ -66,4 +66,4 @@ Password: josiah193
 
 # For GovAgency and Auditor accounts:  
 Old accounts are using testing wallet address from ganache, only wallet address from ganache will work for this system.  
-You must reate new agency and auditor accounts using wallet address from your ganache workspace.  
+You must create new agency and auditor accounts using wallet address from your ganache workspace.  
