@@ -14,7 +14,7 @@
 ## Ganache Setup  
 - Install **Ganache** on https://archive.trufflesuite.com/ganache/.  
 - Open Ganache and Create a workspace, name it whatever you want.  
-- Click Star.  
+- Click Start.  
 - Go to settings->server then change network id to 1337.   
 - Find hardhat.config.js in the root folder.  
 - Change the url to ganache rpc server (Example: http://127.0.0.1:7545).  
